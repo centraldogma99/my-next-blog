@@ -25,6 +25,11 @@ export default async function Post({
         <div className="title-bar-text">
           {extractTitleFromMarkdown(contents)}
         </div>
+        <div className="title-bar-controls">
+          <button aria-label="Minimize" />
+          <button aria-label="Maximize" />
+          <button aria-label="Close" />
+        </div>
       </div>
 
       <div className="window-body">
