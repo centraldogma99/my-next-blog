@@ -20,11 +20,16 @@ export default async function Post({
   const contents = await fetchPostContents(slug);
 
   return (
-    <div>
-      <h1>{extractTitleFromMarkdown(contents)}</h1>
-      <article>
+    <div className="window" style={{ width: "1080px" }}>
+      <div className="title-bar">
+        <div className="title-bar-text">
+          {extractTitleFromMarkdown(contents)}
+        </div>
+      </div>
+
+      <div className="window-body">
         <Markdown>{contents}</Markdown>
-      </article>
+      </div>
     </div>
   );
 }
