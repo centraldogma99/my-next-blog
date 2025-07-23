@@ -2,6 +2,7 @@ import type { GetContentsDetailResponse } from "@/types/githubAPI/getContentsDet
 import { decodeBase64Content } from "@/utils/decodeBase64Content";
 import { extractTitleFromMarkdown } from "@/utils/extractTitleFromMarkdown";
 import { fetchBlogPostsGithubAPI } from "@/utils/fetchGithubAPI";
+import { parseFrontmatter } from "@/utils/parseFrontmatter";
 import Markdown from "react-markdown";
 
 const fetchPostContents = async (slug: string) => {
@@ -18,9 +19,10 @@ export default async function Post({
 }) {
   const { slug } = await params;
   const contents = await fetchPostContents(slug);
+  const { content } = parseFrontmatter(contents);
 
   return (
-    <div className="window" style={{ width: "1080px" }}>
+    <div className="window">
       <div className="title-bar">
         <div className="title-bar-text">
           {extractTitleFromMarkdown(contents)}
@@ -33,7 +35,7 @@ export default async function Post({
       </div>
 
       <div className="window-body">
-        <Markdown>{contents}</Markdown>
+        <Markdown>{content}</Markdown>
       </div>
     </div>
   );

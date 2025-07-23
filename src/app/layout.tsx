@@ -26,6 +26,8 @@ export default function RootLayout({
         style={{
           fontFamily:
             "Pretendard, -apple-system, BlinkMacSystemFont, system-ui, sans-serif",
+          maxWidth: "1080px",
+          margin: "0 auto",
         }}
       >
         {children}
