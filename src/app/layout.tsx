@@ -1,7 +1,8 @@
 import type { Metadata } from "next";
+import { pretendard } from "./fonts";
 
-import "98.css";
 import "./globals.css";
+import "98.css";
 
 export const metadata: Metadata = {
   title: "My Next Blog",
@@ -15,21 +16,8 @@ export default function RootLayout({
 }) {
   return (
     <html lang="ko">
-      <head>
-        <link
-          rel="stylesheet"
-          href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css"
-          crossOrigin="anonymous"
-        />
-      </head>
-      <body
-        style={{
-          fontFamily:
-            "Pretendard, -apple-system, BlinkMacSystemFont, system-ui, sans-serif",
-          maxWidth: "1080px",
-          margin: "0 auto",
-        }}
-      >
+      <head></head>
+      <body className={`${pretendard.variable} max-w-screen-md mx-auto m-0 bg-[#c0c0c0]`}>
         {children}
       </body>
     </html>

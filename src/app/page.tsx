@@ -12,15 +12,6 @@ interface Post {
   frontmatter: Frontmatter;
 }
 
-// 서버에서 태그 계산
-function extractUniqueTags(posts: Post[]): string[] {
-  const tagSet = new Set<string>();
-  posts.forEach((post) => {
-    post.frontmatter.tag.forEach((tag) => tagSet.add(tag));
-  });
-  return Array.from(tagSet).sort();
-}
-
 // 태그별 포스트 개수 계산
 function getTagCounts(posts: Post[]): Record<string, number> {
   const tagCounts: Record<string, number> = {};
@@ -66,32 +57,9 @@ export default async function Posts({
 }) {
   const { tag } = await searchParams;
   const posts = await fetchPosts();
-  const tags = extractUniqueTags(posts);
-  const tagCounts = getTagCounts(posts);
-
-  // 서버에서 필터링 수행
-  const selectedTag = tag || null;
-  const filteredPosts = selectedTag
-    ? posts.filter((post) => post.frontmatter.tag.includes(selectedTag))
-    : posts;
+  const tagAndCounts = getTagCounts(posts);
 
   return (
-    <div className="window">
-      <div className="title-bar">
-        <div className="title-bar-text">Dogma Blog Posts</div>
-        <div className="title-bar-controls">
-          <button aria-label="Minimize" />
-          <button aria-label="Maximize" />
-          <button aria-label="Close" />
-        </div>
-      </div>
-
-      <PostsList
-        posts={filteredPosts}
-        tags={tags}
-        tagCounts={tagCounts}
-        initialTag={selectedTag}
-      />
-    </div>
+    <PostsList posts={posts} tags={tagAndCounts} initialTag={tag || null} />
   );
 }
