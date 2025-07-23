@@ -35,12 +35,39 @@ export default function PostsList({ posts, tags, initialTag }: TabViewProps) {
         />
       </aside>
       <main className={pretendard.className}>
-        <h3>{selectedTag ? `${selectedTag} 포스트` : "포스트"}</h3>
-        {filteredPosts.map((post) => (
-          <div key={post.fileName}>
-            <Link href={`/posts/${post.fileName}`}>{post.title}</Link>
+        <div className="window m-4">
+          <div className="title-bar">
+            <div className="title-bar-text">
+              {selectedTag ? `${selectedTag} 포스트` : "모든 포스트"}
+            </div>
+            <div className="title-bar-controls">
+              <button aria-label="Minimize"></button>
+              <button aria-label="Maximize"></button>
+              <button aria-label="Close"></button>
+            </div>
           </div>
-        ))}
+          <div className="window-body">
+            <div className="sunken-panel">
+              {filteredPosts.map((post) => (
+                <div key={post.fileName} className="field-row-stacked mb-4 p-4 hover:bg-[#0080FF] hover:text-white transition-colors">
+                  <Link href={`/posts/${post.fileName}`} className="block">
+                    <h4 className="text-lg font-bold mb-2">{post.title}</h4>
+                    <div className="flex gap-2 text-sm">
+                      {post.frontmatter.date && (
+                        <span className="status-bar-field">📅 {post.frontmatter.date}</span>
+                      )}
+                      {post.frontmatter.tag && post.frontmatter.tag.length > 0 && (
+                        <span className="status-bar-field">
+                          🏷️ {post.frontmatter.tag.join(", ")}
+                        </span>
+                      )}
+                    </div>
+                  </Link>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
       </main>
     </div>
   );
