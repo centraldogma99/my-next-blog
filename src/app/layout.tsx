@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { pretendard } from "./fonts";
 import "./globals.css";
 import Link from "next/link";
+import { Analytics } from "@vercel/analytics/next";
 
 export const metadata: Metadata = {
   title: "Dogma Blog",
@@ -30,6 +31,7 @@ export default function RootLayout({
           </div>
         </header>
         <main className="container py-6">{children}</main>
+        <Analytics />
       </body>
     </html>
   );
