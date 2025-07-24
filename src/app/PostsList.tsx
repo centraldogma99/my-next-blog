@@ -26,8 +26,8 @@ export default function PostsList({ posts, tags, initialTag }: TabViewProps) {
     : posts;
 
   return (
-    <div className="grid grid-cols-[1fr_3fr]">
-      <aside className="p-4">
+    <div className="grid grid-cols-1 lg:grid-cols-[250px_1fr] gap-6">
+      <aside className="lg:sticky lg:top-6 lg:h-fit">
         <TabFilter
           tagAndCounts={tags}
           selectedTag={selectedTag}
@@ -35,40 +35,50 @@ export default function PostsList({ posts, tags, initialTag }: TabViewProps) {
         />
       </aside>
       <main className={pretendard.className}>
-        <div className="window m-4">
-          <div className="title-bar">
-            <div className="title-bar-text">
-              {selectedTag ? `${selectedTag} 포스트` : "모든 포스트"}
-            </div>
-            <div className="title-bar-controls">
-              <button aria-label="Minimize"></button>
-              <button aria-label="Maximize"></button>
-              <button aria-label="Close"></button>
-            </div>
-          </div>
-          <div className="window-body">
-            <div className="sunken-panel">
-              {filteredPosts.map((post) => (
-                <div key={post.fileName} className="field-row-stacked mb-4 p-4 hover:bg-[#0080FF] hover:text-white transition-colors">
-                  <Link href={`/posts/${post.fileName}`} className="block">
-                    <h4 className="text-lg font-bold mb-2">{post.title}</h4>
-                    <div className="flex gap-2 text-sm">
-                      {post.frontmatter.date && (
-                        <span className="status-bar-field">📅 {post.frontmatter.date}</span>
-                      )}
-                      {post.frontmatter.tag && post.frontmatter.tag.length > 0 && (
-                        <span className="status-bar-field">
-                          🏷️ {post.frontmatter.tag.join(", ")}
-                        </span>
-                      )}
+        <h2 className="text-2xl font-bold mb-6 text-[var(--color-text)]">
+          {selectedTag ? `${selectedTag} 포스트` : "모든 포스트"}
+        </h2>
+        <div className="space-y-4">
+          {filteredPosts.map((post) => (
+            <article
+              key={post.fileName}
+              className="p-4 border border-[var(--color-border)] rounded-lg hover:border-[var(--color-primary)] transition-colors bg-[var(--color-bg)]"
+            >
+              <Link href={`/posts/${post.fileName}`} className="block">
+                <h3 className="text-lg font-semibold mb-2 text-[var(--color-text)] hover:text-[var(--color-primary)]">
+                  {post.title}
+                </h3>
+                <div className="flex flex-wrap gap-4 text-sm text-[var(--color-text-secondary)]">
+                  {post.frontmatter.date && (
+                    <div className="flex items-center gap-1">
+                      <CalendarIcon />
+                      <span>{post.frontmatter.date}</span>
                     </div>
-                  </Link>
+                  )}
+                  {post.frontmatter.tag && post.frontmatter.tag.length > 0 && (
+                    <div className="flex items-center gap-1">
+                      <TagIcon />
+                      <span>{post.frontmatter.tag.join(", ")}</span>
+                    </div>
+                  )}
                 </div>
-              ))}
-            </div>
-          </div>
+              </Link>
+            </article>
+          ))}
         </div>
       </main>
     </div>
   );
 }
+
+const CalendarIcon = () => (
+  <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+    <path d="M4.75 0a.75.75 0 01.75.75V2h5V.75a.75.75 0 011.5 0V2h1.25c.966 0 1.75.784 1.75 1.75v10.5A1.75 1.75 0 0113.25 16H2.75A1.75 1.75 0 011 14.25V3.75C1 2.784 1.784 2 2.75 2H4V.75A.75.75 0 014.75 0zm0 3.5h8.5a.25.25 0 01.25.25V6h-11V3.75a.25.25 0 01.25-.25h2zm-2.25 4v6.75c0 .138.112.25.25.25h10.5a.25.25 0 00.25-.25V7.5h-11z" />
+  </svg>
+);
+
+const TagIcon = () => (
+  <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+    <path d="M2.5 7.775V2.75a.25.25 0 01.25-.25h5.025a.25.25 0 01.177.073l6.25 6.25a.25.25 0 010 .354l-5.025 5.025a.25.25 0 01-.354 0l-6.25-6.25a.25.25 0 01-.073-.177zm-1.5 0V2.75C1 1.784 1.784 1 2.75 1h5.025c.464 0 .91.184 1.238.513l6.25 6.25a1.75 1.75 0 010 2.474l-5.026 5.026a1.75 1.75 0 01-2.474 0l-6.25-6.25A1.75 1.75 0 011 7.775zM6 5a1 1 0 100 2 1 1 0 000-2z" />
+  </svg>
+);

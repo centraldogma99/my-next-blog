@@ -25,7 +25,7 @@ function getTagCounts(posts: Post[]): Record<string, number> {
   return tagCounts;
 }
 
-const fetchPosts = async (): Promise<Post[]> => {
+const fetchAndParsePosts = async (): Promise<Post[]> => {
   const postsListData =
     await fetchBlogPostsGithubAPI<GetContentsResponse[]>("/contents");
 
@@ -56,7 +56,7 @@ export default async function Posts({
   searchParams: Promise<{ tag?: string }>;
 }) {
   const { tag } = await searchParams;
-  const posts = await fetchPosts();
+  const posts = await fetchAndParsePosts();
   const tagAndCounts = getTagCounts(posts);
 
   return (

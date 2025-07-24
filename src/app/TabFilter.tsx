@@ -11,58 +11,102 @@ export default function TabFilter({
   selectedTag,
   onTagSelect,
 }: TabFilterProps) {
+  const totalCount = Object.values(tagAndCounts).reduce(
+    (sum, count) => sum + count,
+    0,
+  );
+
   return (
-    <ul className="tree-view">
-      <Item onClick={() => onTagSelect(null)} isSelected={selectedTag === null}>
-        포스트
-      </Item>
-      <ul>
-        {Object.keys(tagAndCounts).map((tagName) => (
-          <Item
-            key={tagName}
-            onClick={() => onTagSelect(tagName)}
-            isSelected={selectedTag === tagName}
-            firstLetterEmphasis
+    <nav className="sticky top-6">
+      <div className="flex items-center gap-2 mb-4">
+        <TagIcon />
+        <h3 className="text-lg font-semibold text-[var(--color-text)]">태그</h3>
+      </div>
+
+      <div className="space-y-2">
+        <button
+          onClick={() => onTagSelect(null)}
+          className={`w-full group flex items-center justify-between px-4 py-3 rounded-lg transition-all ${
+            selectedTag === null
+              ? "bg-[var(--color-primary)] text-white shadow-sm"
+              : "hover:bg-[var(--color-bg-secondary)] text-[var(--color-text)]"
+          }`}
+        >
+          <span className="font-medium">모든 포스트</span>
+          <span
+            className={`text-sm font-mono ${
+              selectedTag === null
+                ? "text-white/90"
+                : "text-[var(--color-text-secondary)]"
+            }`}
           >
-            {`${tagName} (${tagAndCounts[tagName]})`}
-          </Item>
-        ))}
-      </ul>
-    </ul>
+            {totalCount}
+          </span>
+        </button>
+
+        <div className="space-y-1">
+          {Object.entries(tagAndCounts)
+            .sort(([, a], [, b]) => b - a)
+            .map(([tagName, count]) => (
+              <button
+                key={tagName}
+                onClick={() => onTagSelect(tagName)}
+                className={`w-full group flex items-center justify-between px-4 py-2.5 rounded-lg transition-all ${
+                  selectedTag === tagName
+                    ? "bg-[var(--color-primary)] text-white shadow-sm"
+                    : "hover:bg-[var(--color-bg-secondary)] text-[var(--color-text)]"
+                }`}
+              >
+                <div className="flex items-center gap-2">
+                  <span
+                    className={`text-lg ${
+                      selectedTag === tagName
+                        ? "text-white/80"
+                        : "text-[var(--color-text-secondary)]"
+                    }`}
+                  >
+                    #
+                  </span>
+                  <span className="font-medium">{tagName}</span>
+                </div>
+                <span
+                  className={`text-sm font-mono ${
+                    selectedTag === tagName
+                      ? "text-white/90"
+                      : "text-[var(--color-text-secondary)]"
+                  }`}
+                >
+                  {count}
+                </span>
+              </button>
+            ))}
+        </div>
+      </div>
+
+      <div className="mt-6 pt-6 border-t border-[var(--color-border)]">
+        <div className="flex items-center gap-2 text-sm text-[var(--color-text-secondary)]">
+          <InfoIcon />
+          <span>총 {Object.keys(tagAndCounts).length}개의 태그</span>
+        </div>
+      </div>
+    </nav>
   );
 }
 
-const Item = ({
-  onClick,
-  children,
-  isSelected,
-  firstLetterEmphasis = false,
-}: {
-  onClick: () => void;
-  children: string;
-  isSelected: boolean;
-  firstLetterEmphasis?: boolean;
-}) => {
-  return (
-    <li
-      onClick={onClick}
-      className={`px-1 py-0.5 cursor-pointer ${
-        isSelected
-          ? "bg-[#010088] text-white border border-dotted border-white"
-          : "bg-transparent border border-transparent"
-      }`}
-    >
-      {firstLetterEmphasis ? (
-        <>
-          <span className="underline px-0.25">
-            {children.charAt(0).toUpperCase()}
-          </span>
+const TagIcon = () => (
+  <svg
+    width="20"
+    height="20"
+    viewBox="0 0 16 16"
+    fill="currentColor"
+    className="text-[var(--color-text-secondary)]"
+  >
+    <path d="M2.5 7.775V2.75a.25.25 0 01.25-.25h5.025a.25.25 0 01.177.073l6.25 6.25a.25.25 0 010 .354l-5.025 5.025a.25.25 0 01-.354 0l-6.25-6.25a.25.25 0 01-.073-.177zm-1.5 0V2.75C1 1.784 1.784 1 2.75 1h5.025c.464 0 .91.184 1.238.513l6.25 6.25a1.75 1.75 0 010 2.474l-5.026 5.026a1.75 1.75 0 01-2.474 0l-6.25-6.25A1.75 1.75 0 011 7.775zM6 5a1 1 0 100 2 1 1 0 000-2z" />
+  </svg>
+);
 
-          {children.slice(1)}
-        </>
-      ) : (
-        children
-      )}
-    </li>
-  );
-};
+const InfoIcon = () => (
+  <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+    <path d="M8 1.5a6.5 6.5 0 100 13 6.5 6.5 0 000-13zM0 8a8 8 0 1116 0A8 8 0 010 8zm6.5-.25A.75.75 0 017.25 7h1a.75.75 0 01.75.75v2.75h.25a.75.75 0 010 1.5h-2a.75.75 0 010-1.5h.25v-2h-.25a.75.75 0 01-.75-.75zM8 6a1 1 0 100-2 1 1 0 000 2z" />
+  </svg>
+);

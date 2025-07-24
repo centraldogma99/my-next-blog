@@ -8,9 +8,6 @@ importers:
 
   .:
     dependencies:
-      98.css:
-        specifier: ^0.1.21
-        version: 0.1.21
       class-variance-authority:
         specifier: ^0.7.1
         version: 0.7.1
@@ -32,9 +29,6 @@ importers:
       tailwind-merge:
         specifier: ^3.3.1
         version: 3.3.1
-      xp.css:
-        specifier: ^0.2.6
-        version: 0.2.6
     devDependencies:
       '@eslint/eslintrc':
         specifier: ^3
@@ -71,9 +65,6 @@ importers:
         version: 5.8.3
 
 packages:
-
-  98.css@0.1.21:
-    resolution: {integrity: sha512-ddk5qtUWyapM0Bzd5jwGExoE5fdSEGrP+F5VbYjyZLf2c9UVmn6w2NPTvCsoD4BWdGsjdLjlkQGhWwWTJcYQJQ==}
 
   '@alloc/quick-lru@5.2.0':
     resolution: {integrity: sha512-UrcABB+4bUrFABwbluTIBErXwvbsU/V7TZWfmbgJfbkwiBuziS9gxdODUyuiecfdGQ85jglMW6juS3+z5TsKLw==}
@@ -2073,9 +2064,6 @@ packages:
     resolution: {integrity: sha512-BN22B5eaMMI9UMtjrGd5g5eCYPpCPDUy0FJXbYsaT5zYxjFOckS53SQDE3pWkVoWpHXVb3BrYcEN4Twa55B5cA==}
     engines: {node: '>=0.10.0'}
 
-  xp.css@0.2.6:
-    resolution: {integrity: sha512-v0qUB4wOvyXIMLNid5bIpm+0n5aL4i8wE5dqJH8LNVxE04PxUUxjwf2rNzengegUIK03XC4vbfLVCPAfMLtuqA==}
-
   yallist@5.0.0:
     resolution: {integrity: sha512-YgvUTfwqyc7UXVMrB+SImsVYSmTS8X/tSrtdNZMImM+n7+QTriRXyXim0mBrTXNeqzVF0KWGgHPeiyViFFrNDw==}
     engines: {node: '>=18'}
@@ -2088,8 +2076,6 @@ packages:
     resolution: {integrity: sha512-bXE4cR/kVZhKZX/RjPEflHaKVhUVl85noU3v6b8apfQEc1x4A+zBxjZ4lN8LqGd6WZ3dl98pY4o717VFmoPp+A==}
 
 snapshots:
-
-  98.css@0.1.21: {}
 
   '@alloc/quick-lru@5.2.0': {}
 
@@ -4497,8 +4483,6 @@ snapshots:
       isexe: 2.0.0
 
   word-wrap@1.2.5: {}
-
-  xp.css@0.2.6: {}
 
   yallist@5.0.0: {}
 
