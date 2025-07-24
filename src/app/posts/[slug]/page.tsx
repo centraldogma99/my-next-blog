@@ -32,7 +32,6 @@ export default async function Post({
           h3: ({ children }) => <h3 className="mt-8">{children}</h3>,
           code: ({ children, className, ...props }) => {
             const match = /language-(\w+)/.exec(className || "");
-            console.log(match, className);
 
             return match ? (
               <CodeBlock className={className}>
