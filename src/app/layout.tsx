@@ -22,7 +22,7 @@ export default function RootLayout({
             <h1 className="text-xl font-semibold">
               <Link
                 href="/"
-                className="text-[var(--color-text)] hover:text-[var(--color-text)] no-underline hover:underline-0"
+                className="text-[var(--color-text)] hover:text-[var(--color-text)] no-underline hover:underline-0 cursor-pointer"
               >
                 Dogma Blog
               </Link>

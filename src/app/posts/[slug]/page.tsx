@@ -3,6 +3,7 @@ import { decodeBase64Content } from "@/utils/decodeBase64Content";
 import { extractTitleFromMarkdown } from "@/utils/extractTitleFromMarkdown";
 import { fetchBlogPostsGithubAPI } from "@/utils/fetchGithubAPI";
 import { parseFrontmatter } from "@/utils/parseFrontmatter";
+import { CodeBlock } from "@/components/CodeBlock";
 import Markdown from "react-markdown";
 
 const fetchPostContents = async (slug: string) => {
@@ -22,21 +23,31 @@ export default async function Post({
   const { content } = parseFrontmatter(contents);
 
   return (
-    <div className="window">
-      <div className="title-bar">
-        <div className="title-bar-text">
-          {extractTitleFromMarkdown(contents)}
-        </div>
-        <div className="title-bar-controls">
-          <button aria-label="Minimize" />
-          <button aria-label="Maximize" />
-          <button aria-label="Close" />
-        </div>
-      </div>
+    <article>
+      <h1>{extractTitleFromMarkdown(contents)}</h1>
+      <Markdown
+        components={{
+          h1: ({ children }) => <h1 className="mt-12">{children}</h1>,
+          h2: ({ children }) => <h2 className="mt-10">{children}</h2>,
+          h3: ({ children }) => <h3 className="mt-8">{children}</h3>,
+          code: ({ children, className, ...props }) => {
+            const match = /language-(\w+)/.exec(className || "");
+            console.log(match, className);
 
-      <div className="window-body">
-        <Markdown>{content}</Markdown>
-      </div>
-    </div>
+            return match ? (
+              <CodeBlock className={className}>
+                {String(children).replace(/\n$/, "")}
+              </CodeBlock>
+            ) : (
+              <code className={className} {...props}>
+                {children}
+              </code>
+            );
+          },
+        }}
+      >
+        {content}
+      </Markdown>
+    </article>
   );
 }
