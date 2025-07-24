@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { pretendard } from "./fonts";
 import "./globals.css";
+import Link from "next/link";
 
 export const metadata: Metadata = {
   title: "Dogma Blog",
@@ -18,7 +19,14 @@ export default function RootLayout({
       <body className={`${pretendard.variable}`}>
         <header className="bg-[var(--color-bg-secondary)] border-b border-[var(--color-border)]">
           <div className="container flex items-center h-16">
-            <h1 className="text-xl font-semibold">Dogma Blog</h1>
+            <h1 className="text-xl font-semibold">
+              <Link
+                href="/"
+                className="text-[var(--color-text)] hover:text-[var(--color-text)] no-underline hover:underline-0"
+              >
+                Dogma Blog
+              </Link>
+            </h1>
           </div>
         </header>
         <main className="container py-6">{children}</main>
