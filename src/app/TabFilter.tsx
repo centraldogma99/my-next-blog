@@ -4,17 +4,15 @@ interface TabFilterProps {
   tagAndCounts: Record<string, number>;
   selectedTag: string | null;
   onTagSelect: (tag: string | null) => void;
+  totalPosts: number;
 }
 
 export default function TabFilter({
   tagAndCounts,
   selectedTag,
   onTagSelect,
+  totalPosts,
 }: TabFilterProps) {
-  const totalCount = Object.values(tagAndCounts).reduce(
-    (sum, count) => sum + count,
-    0,
-  );
 
   return (
     <nav className="sticky top-6">
@@ -40,7 +38,7 @@ export default function TabFilter({
                 : "text-[var(--color-text-secondary)]"
             }`}
           >
-            {totalCount}
+            {totalPosts}
           </span>
         </button>
 
