@@ -70,4 +70,39 @@ describe('fetchBlogPostsGithubAPI', () => {
       expect.any(Object)
     )
   })
+
+  it('환경 변수가 없을 때도 정상 동작한다', async () => {
+    const originalKey = process.env.GITHUB_API_KEY
+    delete process.env.GITHUB_API_KEY
+    
+    const mockResponse = { name: 'test' }
+    vi.mocked(fetch).mockResolvedValue({
+      json: () => Promise.resolve(mockResponse),
+    } as Response)
+
+    const result = await fetchBlogPostsGithubAPI('/contents')
+
+    expect(result).toEqual(mockResponse)
+    
+    // 환경 변수 복원
+    if (originalKey) {
+      process.env.GITHUB_API_KEY = originalKey
+    }
+  })
+
+  it('네트워크 에러 시 적절히 처리한다', async () => {
+    vi.mocked(fetch).mockRejectedValue(new Error('Network Error'))
+    
+    await expect(fetchBlogPostsGithubAPI('/contents'))
+      .rejects.toThrow('Network Error')
+  })
+
+  it('JSON 파싱 에러 시 적절히 처리한다', async () => {
+    vi.mocked(fetch).mockResolvedValue({
+      json: () => Promise.reject(new Error('Invalid JSON')),
+    } as Response)
+
+    await expect(fetchBlogPostsGithubAPI('/contents'))
+      .rejects.toThrow('Invalid JSON')
+  })
 })
