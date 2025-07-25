@@ -23,39 +23,15 @@
   text-decoration: var(--shiki-dark-text-decoration) !important;
 }
 
-/* 시스템 설정 (JavaScript 로드 전) */
-@media (prefers-color-scheme: dark) {
-  .shiki,
-  .shiki span {
-    color: var(--shiki-dark) !important;
-    background-color: var(--shiki-dark-bg) !important;
-    font-style: var(--shiki-dark-font-style) !important;
-    font-weight: var(--shiki-dark-font-weight) !important;
-    text-decoration: var(--shiki-dark-text-decoration) !important;
-  }
-}
-
 @layer base {
   :root {
-    --color-border: #d1d5db;
-    --color-text: #24292f;
-    --color-text-secondary: #57606a;
-    --color-bg: #ffffff;
-    --color-bg-secondary: #f6f8fa;
-    --color-primary: #0969da;
-    --color-primary-hover: #0860ca;
-  }
-
-  @media (prefers-color-scheme: dark) {
-    :root {
-      --color-border: #30363d;
-      --color-text: #e6edf3;
-      --color-text-secondary: #8b949e;
-      --color-bg: #0d1117;
-      --color-bg-secondary: #161b22;
-      --color-primary: #2f81f7;
-      --color-primary-hover: #1f6feb;
-    }
+    --color-border: #30363d;
+    --color-text: #e6edf3;
+    --color-text-secondary: #8b949e;
+    --color-bg: #0d1117;
+    --color-bg-secondary: #161b22;
+    --color-primary: #2f81f7;
+    --color-primary-hover: #1f6feb;
   }
 
   :root.light {
@@ -66,16 +42,6 @@
     --color-bg-secondary: #f6f8fa;
     --color-primary: #0969da;
     --color-primary-hover: #0860ca;
-  }
-
-  :root.dark {
-    --color-border: #30363d;
-    --color-text: #e6edf3;
-    --color-text-secondary: #8b949e;
-    --color-bg: #0d1117;
-    --color-bg-secondary: #161b22;
-    --color-primary: #2f81f7;
-    --color-primary-hover: #1f6feb;
   }
 
   * {
@@ -226,9 +192,6 @@
 @layer base {
   * {
     @apply border-border outline-ring/50;
-  }
-  body {
-    @apply bg-background text-foreground;
   }
 
   h1 {

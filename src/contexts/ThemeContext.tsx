@@ -2,81 +2,33 @@
 
 import { createContext, useContext, useEffect, useState } from "react";
 
-type Theme = "light" | "dark" | "system";
+type Theme = "light" | "dark";
 
 interface ThemeContextType {
   setTheme: (theme: Theme) => void;
-  resolvedTheme: "light" | "dark";
   theme: Theme;
 }
 
 const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
 
-const resolveTheme = (theme: Theme) => {
-  if (theme === "system") {
-    return window.matchMedia("(prefers-color-scheme: dark)").matches
-      ? "dark"
-      : "light";
-  }
-  return theme;
-};
-
 export function ThemeProvider({ children }: { children: React.ReactNode }) {
-  const [isSystem, setIsSystem] = useState(true);
-  const [resolvedTheme, setResolvedTheme] = useState<"light" | "dark">("light");
-
-  useEffect(() => {
-    const savedTheme = localStorage.getItem("theme") as Theme;
-    if (savedTheme) {
-      setResolvedTheme(resolveTheme(savedTheme));
-    }
-  }, []);
-
-  useEffect(() => {
-    const updateToSystemTheme = () => {
-      setResolvedTheme(
-        window.matchMedia("(prefers-color-scheme: dark)").matches
-          ? "dark"
-          : "light",
-      );
-    };
-
-    if (isSystem) {
-      const mediaQuery = window.matchMedia("(prefers-color-scheme: dark)");
-      mediaQuery.addEventListener("change", updateToSystemTheme);
-      return () =>
-        mediaQuery.removeEventListener("change", updateToSystemTheme);
-    }
-  }, [isSystem]);
+  const [theme, setThemeState] = useState<Theme>("dark");
 
   useEffect(() => {
     const root = document.documentElement;
-    if (resolvedTheme === "dark") {
-      root.classList.remove("light");
-      root.classList.add("dark");
-    } else {
-      root.classList.remove("dark");
-      root.classList.add("light");
-    }
-  }, [resolvedTheme]);
+    root.classList.remove("light", "dark");
+    root.classList.add(theme);
+  }, [theme]);
 
   const handleSetTheme = (newTheme: Theme) => {
-    if (newTheme === "system") {
-      setIsSystem(true);
-    } else {
-      setIsSystem(false);
-      setResolvedTheme(resolveTheme(newTheme));
-    }
-
-    localStorage.setItem("theme", newTheme);
+    setThemeState(newTheme);
   };
 
   return (
     <ThemeContext.Provider
       value={{
         setTheme: handleSetTheme,
-        resolvedTheme,
-        theme: isSystem ? "system" : resolvedTheme,
+        theme,
       }}
     >
       {children}
