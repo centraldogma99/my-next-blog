@@ -36,9 +36,8 @@ jobs:
       if: always()
       with:
         script: |
-          const { context } = require('@actions/core');
           github.rest.issues.createComment({
-            issue_number: context.payload.pull_request.number,
+            issue_number: context.issue.number,
             owner: context.repo.owner,
             repo: context.repo.repo,
             body: '✅ 모든 테스트가 통과했습니다! 🎉'
