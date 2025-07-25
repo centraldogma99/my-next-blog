@@ -32,6 +32,7 @@ export default function PostsList({ posts, tags, initialTag }: TabViewProps) {
           tagAndCounts={tags}
           selectedTag={selectedTag}
           onTagSelect={setSelectedTag}
+          totalPosts={posts.length}
         />
       </aside>
       <main className={pretendard.className}>
