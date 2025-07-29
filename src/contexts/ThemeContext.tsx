@@ -4,6 +4,8 @@ import { createContext, useContext, useState } from "react";
 
 type Theme = "light" | "dark";
 
+export const DEFAULT_THEME = "dark";
+
 interface ThemeContextType {
   setTheme: (theme: Theme) => void;
   theme: Theme;
@@ -12,7 +14,7 @@ interface ThemeContextType {
 const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
 
 export function ThemeProvider({ children }: { children: React.ReactNode }) {
-  const [theme, setThemeState] = useState<Theme>("dark");
+  const [theme, setThemeState] = useState<Theme>(DEFAULT_THEME);
 
   const handleSetTheme = (newTheme: Theme) => {
     setThemeState(newTheme);

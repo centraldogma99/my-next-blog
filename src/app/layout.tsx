@@ -3,7 +3,7 @@ import { pretendard } from "./fonts";
 import "./globals.css";
 import Link from "next/link";
 import { Analytics } from "@vercel/analytics/next";
-import { ThemeProvider } from "@/contexts/ThemeContext";
+import { DEFAULT_THEME, ThemeProvider } from "@/contexts/ThemeContext";
 import { ThemeToggle } from "@/components/ThemeToggle";
 
 export const metadata: Metadata = {
@@ -17,7 +17,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="ko">
+    <html lang="ko" className={DEFAULT_THEME}>
       <head></head>
       <body className={`${pretendard.variable}`}>
         <ThemeProvider>
