@@ -2,21 +2,22 @@ import type { BundledLanguage } from "shiki";
 import { toJsxRuntime } from "hast-util-to-jsx-runtime";
 import { Fragment, type JSX } from "react";
 import { jsx, jsxs } from "react/jsx-runtime";
-import { codeToHast } from "shiki";
+import { codeToHast, bundledLanguages } from "shiki";
+import { DEFAULT_THEME } from "@/constants/theme";
 
 interface CodeBlockProps {
   children: string;
   className?: string;
+  language: BundledLanguage;
 }
 
-export async function CodeBlock({ children, className }: CodeBlockProps) {
-  let language: BundledLanguage | "text" = "text";
+export const isSupportedLanguage = (
+  language: string,
+): language is BundledLanguage => {
+  return language in bundledLanguages;
+};
 
-  if (className?.startsWith("language-")) {
-    const lang = className.replace("language-", "");
-    language = lang as BundledLanguage;
-  }
-
+export async function CodeBlock({ children, language }: CodeBlockProps) {
   try {
     const out = await codeToHast(children, {
       lang: language,
@@ -24,24 +25,14 @@ export async function CodeBlock({ children, className }: CodeBlockProps) {
         light: "github-light",
         dark: "github-dark",
       },
+      defaultColor: DEFAULT_THEME,
     });
-
     return toJsxRuntime(out, {
       Fragment,
       jsx,
       jsxs,
-      components: {
-        pre: (props) => (
-          <pre
-            {...props}
-            className={`${props.className || ""} p-4 rounded-md`}
-          />
-        ),
-      },
     }) as JSX.Element;
   } catch {
-    return (
-      <pre className={`${className || ""} p-4 rounded-md`}>{children}</pre>
-    );
+    return <code>{children}</code>;
   }
 }

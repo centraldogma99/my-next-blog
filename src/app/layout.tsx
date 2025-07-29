@@ -5,6 +5,7 @@ import Link from "next/link";
 import { Analytics } from "@vercel/analytics/next";
 import { ThemeProvider } from "@/contexts/ThemeContext";
 import { ThemeToggle } from "@/components/ThemeToggle";
+import { DEFAULT_THEME } from "@/constants/theme";
 
 export const metadata: Metadata = {
   title: "Dogma Blog",
@@ -17,7 +18,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="ko">
+    <html lang="ko" className={DEFAULT_THEME}>
       <head></head>
       <body className={`${pretendard.variable}`}>
         <ThemeProvider>

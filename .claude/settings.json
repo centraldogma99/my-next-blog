@@ -1,6 +1,5 @@
 {
   "permissions": {
-    "allow": ["Bash(gh pr create:*)", "Bash(git:*)", "Bash(gh pr edit:*)"],
-    "deny": ["Bash(git commit:*)"]
+    "allow": ["Bash(gh pr create:*)", "Bash(git:*)", "Bash(gh pr edit:*)"]
   }
 }
