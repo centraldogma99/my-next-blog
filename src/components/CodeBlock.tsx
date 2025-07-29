@@ -3,6 +3,7 @@ import { toJsxRuntime } from "hast-util-to-jsx-runtime";
 import { Fragment, type JSX } from "react";
 import { jsx, jsxs } from "react/jsx-runtime";
 import { codeToHast, bundledLanguages } from "shiki";
+import { DEFAULT_THEME } from "@/constants/theme";
 
 interface CodeBlockProps {
   children: string;
@@ -24,7 +25,7 @@ export async function CodeBlock({ children, language }: CodeBlockProps) {
         light: "github-light",
         dark: "github-dark",
       },
-      defaultColor: false,
+      defaultColor: DEFAULT_THEME,
     });
     return toJsxRuntime(out, {
       Fragment,

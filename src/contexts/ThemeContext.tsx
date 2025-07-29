@@ -1,10 +1,9 @@
 "use client";
 
+import { DEFAULT_THEME } from "@/constants/theme";
 import { createContext, useContext, useState } from "react";
 
 type Theme = "light" | "dark";
-
-export const DEFAULT_THEME = "dark";
 
 interface ThemeContextType {
   setTheme: (theme: Theme) => void;

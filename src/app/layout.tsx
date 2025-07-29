@@ -3,8 +3,9 @@ import { pretendard } from "./fonts";
 import "./globals.css";
 import Link from "next/link";
 import { Analytics } from "@vercel/analytics/next";
-import { DEFAULT_THEME, ThemeProvider } from "@/contexts/ThemeContext";
+import { ThemeProvider } from "@/contexts/ThemeContext";
 import { ThemeToggle } from "@/components/ThemeToggle";
+import { DEFAULT_THEME } from "@/constants/theme";
 
 export const metadata: Metadata = {
   title: "Dogma Blog",
