@@ -57,7 +57,7 @@ export const metadata: Metadata = {
     },
   },
   verification: {
-    google: "your-google-verification-code", // Google Search Console에서 받은 인증 코드
+    google: "zIXlP_nEMHeMayTwzohtA8sPvi8XQtA4Z2JW77bH42U", // Google Search Console에서 받은 인증 코드
     // yandex: "your-yandex-verification-code",
   },
 };
