@@ -78,6 +78,7 @@ export function parseFrontmatter(markdownContent: string): ParseResult {
 export interface Frontmatter {
   title: string;
   subtitle?: string;
+  description?: string;
   date: string;
   draft: boolean;
   tag: string[];
