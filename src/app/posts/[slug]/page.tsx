@@ -7,6 +7,7 @@ import { parseFrontmatter } from "@/utils/parseFrontmatter";
 import type { ReactNode } from "react";
 import React from "react";
 import Markdown from "react-markdown";
+import type { Metadata } from "next";
 
 const fetchPostContents = async (slug: string) => {
   const data = await fetchBlogPostsGithubAPI<GetContentsDetailResponse>(
@@ -38,6 +39,37 @@ const isValidCodeElement = (
   );
 };
 
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ slug: string }>;
+}): Promise<Metadata> {
+  const { slug } = await params;
+  const contents = await fetchPostContents(slug);
+  const { frontmatter } = parseFrontmatter(contents);
+  const title = extractTitleFromMarkdown(contents);
+
+  return {
+    title,
+    description: frontmatter.description || `${title}에 대한 글입니다.`,
+    keywords: frontmatter.tag,
+    authors: [{ name: "Dogma" }],
+    openGraph: {
+      title,
+      description: frontmatter.description || `${title}에 대한 글입니다.`,
+      type: "article",
+      publishedTime: frontmatter.date,
+      authors: ["Dogma"],
+      tags: frontmatter.tag,
+    },
+    twitter: {
+      card: "summary_large_image",
+      title,
+      description: frontmatter.description || `${title}에 대한 글입니다.`,
+    },
+  };
+}
+
 export default async function Post({
   params,
 }: {
@@ -45,40 +77,74 @@ export default async function Post({
 }) {
   const { slug } = await params;
   const contents = await fetchPostContents(slug);
-  const { content } = parseFrontmatter(contents);
+  const { content, frontmatter } = parseFrontmatter(contents);
+  const title = extractTitleFromMarkdown(contents);
+
+  const jsonLd = {
+    "@context": "https://schema.org",
+    "@type": "BlogPosting",
+    headline: title,
+    description: frontmatter.description || `${title}에 대한 글입니다.`,
+    datePublished: frontmatter.date,
+    dateModified: frontmatter.date,
+    author: {
+      "@type": "Person",
+      name: "Dogma",
+    },
+    publisher: {
+      "@type": "Person",
+      name: "Dogma",
+    },
+    keywords: frontmatter.tag.join(", "),
+  };
 
   return (
-    <article>
-      <h1>{extractTitleFromMarkdown(contents)}</h1>
-      <Markdown
-        components={{
-          h1: ({ children }) => <h1 className="mt-12">{children}</h1>,
-          h2: ({ children }) => <h2 className="mt-10">{children}</h2>,
-          h3: ({ children }) => <h3 className="mt-8">{children}</h3>,
-          pre: (props) => {
-            const codeElement = getChildrenCodeTag(props.children);
-            if (!codeElement || !isValidCodeElement(codeElement))
-              return <pre>{props.children}</pre>;
+    <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
+      <article>
+        <h1>{extractTitleFromMarkdown(contents)}</h1>
+        <Markdown
+          components={{
+            h1: ({ children }) => <h1 className="mt-12">{children}</h1>,
+            h2: ({ children }) => <h2 className="mt-10">{children}</h2>,
+            h3: ({ children }) => <h3 className="mt-8">{children}</h3>,
+            img: ({ src, alt, ...props }) => (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img
+                src={src}
+                alt={alt || "블로그 이미지"}
+                loading="lazy"
+                {...props}
+              />
+            ),
+            pre: (props) => {
+              const codeElement = getChildrenCodeTag(props.children);
+              if (!codeElement || !isValidCodeElement(codeElement))
+                return <pre>{props.children}</pre>;
 
-            // 타입 가드를 통과했으므로 안전하게 접근 가능
-            const codeProps = codeElement.props as {
-              className: string;
-              children: React.ReactNode;
-            };
-            const language = codeProps.className.replace("language-", "");
+              // 타입 가드를 통과했으므로 안전하게 접근 가능
+              const codeProps = codeElement.props as {
+                className: string;
+                children: React.ReactNode;
+              };
+              const language = codeProps.className.replace("language-", "");
 
-            if (language && isSupportedLanguage(language))
-              return (
-                <CodeBlock language={language}>
-                  {String(codeProps.children)}
-                </CodeBlock>
-              );
-            else return <pre>{props.children}</pre>;
-          },
-        }}
-      >
-        {content}
-      </Markdown>
-    </article>
+              if (language && isSupportedLanguage(language))
+                return (
+                  <CodeBlock language={language}>
+                    {String(codeProps.children)}
+                  </CodeBlock>
+                );
+              else return <pre>{props.children}</pre>;
+            },
+          }}
+        >
+          {content}
+        </Markdown>
+      </article>
+    </>
   );
 }
