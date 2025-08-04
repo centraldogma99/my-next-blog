@@ -34,7 +34,7 @@ const fetchAndParsePosts = async (): Promise<Post[]> => {
       githubFile.name.endsWith(".md") || githubFile.name.endsWith(".mdx"),
   );
 
-  return Promise.all(
+  const posts = await Promise.all(
     filteredPostsListData.map(async (post) => {
       const data = await fetchBlogPostsGithubAPI<GetContentsDetailResponse>(
         `/contents/${post.name}`,
@@ -48,6 +48,13 @@ const fetchAndParsePosts = async (): Promise<Post[]> => {
       };
     }),
   );
+
+  // 날짜순으로 정렬 (최신순)
+  return posts.sort((a, b) => {
+    const dateA = new Date(a.frontmatter.date);
+    const dateB = new Date(b.frontmatter.date);
+    return dateB.getTime() - dateA.getTime();
+  });
 };
 
 export default async function Posts({

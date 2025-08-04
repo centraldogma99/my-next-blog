@@ -20,7 +20,8 @@ export function parseFrontmatter(markdownContent: string): ParseResult {
   // YAML 형태의 frontmatter를 파싱
   const lines = frontmatterStr.split("\n");
 
-  for (const line of lines) {
+  for (let i = 0; i < lines.length; i++) {
+    const line = lines[i];
     const trimmedLine = line.trim();
     if (!trimmedLine || trimmedLine.startsWith("#")) continue;
 
@@ -41,27 +42,34 @@ export function parseFrontmatter(markdownContent: string): ParseResult {
     const key = trimmedLine.slice(0, colonIndex).trim();
     let value: string | boolean = trimmedLine.slice(colonIndex + 1).trim();
 
-    // 따옴표 제거
-    if (
-      (value.startsWith("'") && value.endsWith("'")) ||
-      (value.startsWith('"') && value.endsWith('"'))
-    ) {
-      value = value.slice(1, -1);
-    }
-
     // 다음 줄이 배열인지 확인
-    const nextLineIndex = lines.indexOf(line) + 1;
     if (
-      nextLineIndex < lines.length &&
-      lines[nextLineIndex].trim().startsWith("-")
+      i + 1 < lines.length &&
+      lines[i + 1].trim().startsWith("-")
     ) {
       frontmatter[key] = [];
     } else {
-      // boolean 값 처리
-      if (value === "true") value = true;
-      else if (value === "false") value = false;
-
-      frontmatter[key] = value;
+      // 빈 값 처리
+      if (value === "") {
+        frontmatter[key] = "";
+      } else {
+        // 따옴표 처리
+        if (
+          (value.startsWith("'") && value.endsWith("'")) ||
+          (value.startsWith('"') && value.endsWith('"'))
+        ) {
+          value = value.slice(1, -1);
+        }
+        
+        // boolean 값 처리
+        if (value === "true") {
+          frontmatter[key] = true;
+        } else if (value === "false") {
+          frontmatter[key] = false;
+        } else {
+          frontmatter[key] = value;
+        }
+      }
     }
   }
 

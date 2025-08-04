@@ -111,6 +111,7 @@ export default async function Post({
             h1: ({ children }) => <h1 className="mt-12">{children}</h1>,
             h2: ({ children }) => <h2 className="mt-10">{children}</h2>,
             h3: ({ children }) => <h3 className="mt-8">{children}</h3>,
+            h4: ({ children }) => <h4 className="mt-6">{children}</h4>,
             img: ({ src, alt, ...props }) => (
               // eslint-disable-next-line @next/next/no-img-element
               <img

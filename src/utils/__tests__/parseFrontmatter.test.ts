@@ -75,6 +75,62 @@ title: "테스트"
 
     expect(() => parseFrontmatter(markdown)).toThrow('Invalid frontmatter')
   })
+
+  it('따옴표 없는 제목을 올바르게 파싱한다', () => {
+    const markdown = `---
+title: React Router loader와 Tanstack Query를 활용한 사용자 상태에 따른 리다이렉트 구현하기
+date: 2025-08-01
+draft: false
+tag:
+- react
+- typescript
+---
+
+내용`
+
+    const result = parseFrontmatter(markdown)
+
+    expect(result.frontmatter.title).toBe('React Router loader와 Tanstack Query를 활용한 사용자 상태에 따른 리다이렉트 구현하기')
+    expect(result.frontmatter.date).toBe('2025-08-01')
+  })
+
+  it('빈 subtitle 값을 올바르게 파싱한다', () => {
+    const markdown = `---
+title: 테스트 제목
+subtitle: 
+date: 2025-08-01
+draft: false
+tag:
+- test
+---
+
+내용`
+
+    const result = parseFrontmatter(markdown)
+
+    expect(result.frontmatter.subtitle).toBe('')
+    expect(result.frontmatter.title).toBe('테스트 제목')
+  })
+
+  it('작은 따옴표와 큰 따옴표가 섞여있어도 올바르게 파싱한다', () => {
+    const markdown = `---
+title: '작은 따옴표 제목'
+subtitle: "큰 따옴표 부제목"
+description: 따옴표 없는 설명
+date: 2025-08-01
+draft: false
+tag:
+- test
+---
+
+내용`
+
+    const result = parseFrontmatter(markdown)
+
+    expect(result.frontmatter.title).toBe('작은 따옴표 제목')
+    expect(result.frontmatter.subtitle).toBe('큰 따옴표 부제목')
+    expect(result.frontmatter.description).toBe('따옴표 없는 설명')
+  })
 })
 
 describe('isValidFrontmatter', () => {
