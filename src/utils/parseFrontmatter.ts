@@ -43,10 +43,7 @@ export function parseFrontmatter(markdownContent: string): ParseResult {
     let value: string | boolean = trimmedLine.slice(colonIndex + 1).trim();
 
     // 다음 줄이 배열인지 확인
-    if (
-      i + 1 < lines.length &&
-      lines[i + 1].trim().startsWith("-")
-    ) {
+    if (i + 1 < lines.length && lines[i + 1].trim().startsWith("-")) {
       frontmatter[key] = [];
     } else {
       // 빈 값 처리
@@ -60,7 +57,7 @@ export function parseFrontmatter(markdownContent: string): ParseResult {
         ) {
           value = value.slice(1, -1);
         }
-        
+
         // boolean 값 처리
         if (value === "true") {
           frontmatter[key] = true;

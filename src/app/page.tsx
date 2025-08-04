@@ -2,7 +2,6 @@ import PostsList from "@/app/PostsList";
 import type { GetContentsResponse } from "@/types/githubAPI/getContents";
 import type { GetContentsDetailResponse } from "@/types/githubAPI/getContentsDetail";
 import { decodeBase64Content } from "@/utils/decodeBase64Content";
-import { extractTitleFromMarkdown } from "@/utils/extractTitleFromMarkdown";
 import { fetchBlogPostsGithubAPI } from "@/utils/fetchGithubAPI";
 import { parseFrontmatter, type Frontmatter } from "@/utils/parseFrontmatter";
 
@@ -42,7 +41,7 @@ const fetchAndParsePosts = async (): Promise<Post[]> => {
       const decodedContent = decodeBase64Content(data.content);
       const { frontmatter } = parseFrontmatter(decodedContent);
       return {
-        title: extractTitleFromMarkdown(decodedContent),
+        title: frontmatter.title,
         frontmatter,
         fileName: data.name,
       };
