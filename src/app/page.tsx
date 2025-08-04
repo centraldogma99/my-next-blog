@@ -2,7 +2,6 @@ import PostsList from "@/app/PostsList";
 import type { GetContentsResponse } from "@/types/githubAPI/getContents";
 import type { GetContentsDetailResponse } from "@/types/githubAPI/getContentsDetail";
 import { decodeBase64Content } from "@/utils/decodeBase64Content";
-import { extractTitleFromMarkdown } from "@/utils/extractTitleFromMarkdown";
 import { fetchBlogPostsGithubAPI } from "@/utils/fetchGithubAPI";
 import { parseFrontmatter, type Frontmatter } from "@/utils/parseFrontmatter";
 
@@ -34,7 +33,7 @@ const fetchAndParsePosts = async (): Promise<Post[]> => {
       githubFile.name.endsWith(".md") || githubFile.name.endsWith(".mdx"),
   );
 
-  return Promise.all(
+  const posts = await Promise.all(
     filteredPostsListData.map(async (post) => {
       const data = await fetchBlogPostsGithubAPI<GetContentsDetailResponse>(
         `/contents/${post.name}`,
@@ -42,12 +41,19 @@ const fetchAndParsePosts = async (): Promise<Post[]> => {
       const decodedContent = decodeBase64Content(data.content);
       const { frontmatter } = parseFrontmatter(decodedContent);
       return {
-        title: extractTitleFromMarkdown(decodedContent),
+        title: frontmatter.title,
         frontmatter,
         fileName: data.name,
       };
     }),
   );
+
+  // 날짜순으로 정렬 (최신순)
+  return posts.sort((a, b) => {
+    const dateA = new Date(a.frontmatter.date);
+    const dateB = new Date(b.frontmatter.date);
+    return dateB.getTime() - dateA.getTime();
+  });
 };
 
 export default async function Posts({

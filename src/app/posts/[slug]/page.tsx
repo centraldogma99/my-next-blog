@@ -1,7 +1,6 @@
 import { CodeBlock, isSupportedLanguage } from "@/components/CodeBlock";
 import type { GetContentsDetailResponse } from "@/types/githubAPI/getContentsDetail";
 import { decodeBase64Content } from "@/utils/decodeBase64Content";
-import { extractTitleFromMarkdown } from "@/utils/extractTitleFromMarkdown";
 import { fetchBlogPostsGithubAPI } from "@/utils/fetchGithubAPI";
 import { parseFrontmatter } from "@/utils/parseFrontmatter";
 import type { ReactNode } from "react";
@@ -47,16 +46,17 @@ export async function generateMetadata({
   const { slug } = await params;
   const contents = await fetchPostContents(slug);
   const { frontmatter } = parseFrontmatter(contents);
-  const title = extractTitleFromMarkdown(contents);
 
   return {
-    title,
-    description: frontmatter.description || `${title}에 대한 글입니다.`,
+    title: frontmatter.title,
+    description:
+      frontmatter.description || `${frontmatter.title}에 대한 글입니다.`,
     keywords: frontmatter.tag,
     authors: [{ name: "Dogma" }],
     openGraph: {
-      title,
-      description: frontmatter.description || `${title}에 대한 글입니다.`,
+      title: frontmatter.title,
+      description:
+        frontmatter.description || `${frontmatter.title}에 대한 글입니다.`,
       type: "article",
       publishedTime: frontmatter.date,
       authors: ["Dogma"],
@@ -64,8 +64,9 @@ export async function generateMetadata({
     },
     twitter: {
       card: "summary_large_image",
-      title,
-      description: frontmatter.description || `${title}에 대한 글입니다.`,
+      title: frontmatter.title,
+      description:
+        frontmatter.description || `${frontmatter.title}에 대한 글입니다.`,
     },
   };
 }
@@ -78,13 +79,13 @@ export default async function Post({
   const { slug } = await params;
   const contents = await fetchPostContents(slug);
   const { content, frontmatter } = parseFrontmatter(contents);
-  const title = extractTitleFromMarkdown(contents);
 
   const jsonLd = {
     "@context": "https://schema.org",
     "@type": "BlogPosting",
-    headline: title,
-    description: frontmatter.description || `${title}에 대한 글입니다.`,
+    headline: frontmatter.title,
+    description:
+      frontmatter.description || `${frontmatter.title}에 대한 글입니다.`,
     datePublished: frontmatter.date,
     dateModified: frontmatter.date,
     author: {
@@ -105,12 +106,13 @@ export default async function Post({
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
       <article>
-        <h1>{extractTitleFromMarkdown(contents)}</h1>
+        <h1>{frontmatter.title}</h1>
         <Markdown
           components={{
             h1: ({ children }) => <h1 className="mt-12">{children}</h1>,
             h2: ({ children }) => <h2 className="mt-10">{children}</h2>,
             h3: ({ children }) => <h3 className="mt-8">{children}</h3>,
+            h4: ({ children }) => <h4 className="mt-6">{children}</h4>,
             img: ({ src, alt, ...props }) => (
               // eslint-disable-next-line @next/next/no-img-element
               <img
