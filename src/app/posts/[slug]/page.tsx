@@ -1,19 +1,19 @@
 import { CodeBlock, isSupportedLanguage } from "@/components/CodeBlock";
-import type { GetContentsDetailResponse } from "@/types/githubAPI/getContentsDetail";
-import { decodeBase64Content } from "@/utils/decodeBase64Content";
+import { HashScrollHandler } from "@/components/HashScrollHandler";
+import { HeadingWithAnchor } from "@/components/HeadingWithAnchor";
+import type { GetContentsDetailData } from "@/types/githubAPI/getContentsDetail";
 import { fetchBlogPostsGithubAPI } from "@/utils/fetchGithubAPI";
-import { parseFrontmatter } from "@/utils/parseFrontmatter";
+import { parseContent } from "@/utils/parseFrontmatter";
 import type { ReactNode } from "react";
 import React from "react";
 import Markdown from "react-markdown";
 import type { Metadata } from "next";
+import { TableOfContents } from "@/components/TableOfContents";
+import { decodeBase64Content } from "@/utils/decodeBase64Content";
+import { notFound } from "next/navigation";
 
-const fetchPostContents = async (slug: string) => {
-  const data = await fetchBlogPostsGithubAPI<GetContentsDetailResponse>(
-    `/contents/${slug}`,
-  );
-  return decodeBase64Content(data.content);
-};
+const fetchPostContents = (slug: string) =>
+  fetchBlogPostsGithubAPI<GetContentsDetailData>(`/contents/${slug}`);
 
 const getChildrenCodeTag = (node: ReactNode) => {
   if (!node || React.Children.count(node) !== 1) return false;
@@ -44,8 +44,11 @@ export async function generateMetadata({
   params: Promise<{ slug: string }>;
 }): Promise<Metadata> {
   const { slug } = await params;
-  const contents = await fetchPostContents(slug);
-  const { frontmatter } = parseFrontmatter(contents);
+  
+  try {
+    const data = await fetchPostContents(slug);
+    const decodedContent = decodeBase64Content(data.content);
+    const { frontmatter } = parseContent(decodedContent);
 
   return {
     title: frontmatter.title,
@@ -69,6 +72,12 @@ export async function generateMetadata({
         frontmatter.description || `${frontmatter.title}에 대한 글입니다.`,
     },
   };
+  } catch {
+    return {
+      title: "포스트를 찾을 수 없습니다",
+      description: "요청하신 포스트가 존재하지 않거나 삭제되었을 수 있습니다.",
+    };
+  }
 }
 
 export default async function Post({
@@ -77,8 +86,20 @@ export default async function Post({
   params: Promise<{ slug: string }>;
 }) {
   const { slug } = await params;
-  const contents = await fetchPostContents(slug);
-  const { content, frontmatter } = parseFrontmatter(contents);
+  
+  let data;
+  try {
+    data = await fetchPostContents(slug);
+  } catch {
+    notFound();
+  }
+  
+  const decodedContent = decodeBase64Content(data.content);
+  const { content, frontmatter } = parseContent(decodedContent);
+
+  if (frontmatter.draft) {
+    notFound();
+  }
 
   const jsonLd = {
     "@context": "https://schema.org",
@@ -101,51 +122,73 @@ export default async function Post({
 
   return (
     <>
+      <HashScrollHandler />
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
-      <article>
-        <h1>{frontmatter.title}</h1>
-        <Markdown
-          components={{
-            h1: ({ children }) => <h1 className="mt-12">{children}</h1>,
-            h2: ({ children }) => <h2 className="mt-10">{children}</h2>,
-            h3: ({ children }) => <h3 className="mt-8">{children}</h3>,
-            h4: ({ children }) => <h4 className="mt-6">{children}</h4>,
-            img: ({ src, alt, ...props }) => (
-              // eslint-disable-next-line @next/next/no-img-element
-              <img
-                src={src}
-                alt={alt || "블로그 이미지"}
-                loading="lazy"
-                {...props}
-              />
-            ),
-            pre: (props) => {
-              const codeElement = getChildrenCodeTag(props.children);
-              if (!codeElement || !isValidCodeElement(codeElement))
-                return <pre>{props.children}</pre>;
+      <article className="h-[calc(100vh_-_64px_-_var(--spacing)*24)]">
+        <div className="grid grid-cols-[1fr_3fr] gap-8 h-full">
+          <TableOfContents content={content} className="sticky top-16 py-4" />
+          <div className="py-6 h-full overflow-y-auto">
+            <h1>{frontmatter.title}</h1>
+            <Markdown
+              components={{
+                h1: ({ children }) => (
+                  <HeadingWithAnchor level={1} className="mt-30">
+                    {children}
+                  </HeadingWithAnchor>
+                ),
+                h2: ({ children }) => (
+                  <HeadingWithAnchor level={2} className="mt-24">
+                    {children}
+                  </HeadingWithAnchor>
+                ),
+                h3: ({ children }) => (
+                  <HeadingWithAnchor level={3} className="mt-16">
+                    {children}
+                  </HeadingWithAnchor>
+                ),
+                h4: ({ children }) => (
+                  <HeadingWithAnchor level={4} className="mt-12">
+                    {children}
+                  </HeadingWithAnchor>
+                ),
+                img: ({ src, alt, ...props }) => (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img
+                    src={src}
+                    alt={alt || "블로그 이미지"}
+                    loading="lazy"
+                    {...props}
+                  />
+                ),
+                pre: (props) => {
+                  const codeElement = getChildrenCodeTag(props.children);
+                  if (!codeElement || !isValidCodeElement(codeElement))
+                    return <pre>{props.children}</pre>;
 
-              // 타입 가드를 통과했으므로 안전하게 접근 가능
-              const codeProps = codeElement.props as {
-                className: string;
-                children: React.ReactNode;
-              };
-              const language = codeProps.className.replace("language-", "");
+                  // 타입 가드를 통과했으므로 안전하게 접근 가능
+                  const codeProps = codeElement.props as {
+                    className: string;
+                    children: React.ReactNode;
+                  };
+                  const language = codeProps.className.replace("language-", "");
 
-              if (language && isSupportedLanguage(language))
-                return (
-                  <CodeBlock language={language}>
-                    {String(codeProps.children)}
-                  </CodeBlock>
-                );
-              else return <pre>{props.children}</pre>;
-            },
-          }}
-        >
-          {content}
-        </Markdown>
+                  if (language && isSupportedLanguage(language))
+                    return (
+                      <CodeBlock language={language}>
+                        {String(codeProps.children)}
+                      </CodeBlock>
+                    );
+                  else return <pre>{props.children}</pre>;
+                },
+              }}
+            >
+              {content}
+            </Markdown>
+          </div>
+        </div>
       </article>
     </>
   );

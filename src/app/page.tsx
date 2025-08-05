@@ -1,12 +1,11 @@
 import PostsList from "@/app/PostsList";
 import type { GetContentsResponse } from "@/types/githubAPI/getContents";
-import type { GetContentsDetailResponse } from "@/types/githubAPI/getContentsDetail";
+import type { GetContentsDetailData } from "@/types/githubAPI/getContentsDetail";
 import { decodeBase64Content } from "@/utils/decodeBase64Content";
 import { fetchBlogPostsGithubAPI } from "@/utils/fetchGithubAPI";
-import { parseFrontmatter, type Frontmatter } from "@/utils/parseFrontmatter";
+import { parseContent, type Frontmatter } from "@/utils/parseFrontmatter";
 
-interface Post {
-  title: string;
+export interface Post {
   fileName: string;
   frontmatter: Frontmatter;
 }
@@ -35,13 +34,12 @@ const fetchAndParsePosts = async (): Promise<Post[]> => {
 
   const posts = await Promise.all(
     filteredPostsListData.map(async (post) => {
-      const data = await fetchBlogPostsGithubAPI<GetContentsDetailResponse>(
+      const data = await fetchBlogPostsGithubAPI<GetContentsDetailData>(
         `/contents/${post.name}`,
       );
       const decodedContent = decodeBase64Content(data.content);
-      const { frontmatter } = parseFrontmatter(decodedContent);
+      const { frontmatter } = parseContent(decodedContent);
       return {
-        title: frontmatter.title,
         frontmatter,
         fileName: data.name,
       };
@@ -66,6 +64,10 @@ export default async function Posts({
   const tagAndCounts = getTagCounts(posts);
 
   return (
-    <PostsList posts={posts} tags={tagAndCounts} initialTag={tag || null} />
+    <PostsList
+      posts={posts.filter((post) => post.frontmatter.draft === false)}
+      tags={tagAndCounts}
+      initialTag={tag || null}
+    />
   );
 }

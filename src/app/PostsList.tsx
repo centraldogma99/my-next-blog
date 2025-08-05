@@ -1,16 +1,10 @@
 "use client";
 
-import type { Frontmatter } from "@/utils/parseFrontmatter";
 import Link from "next/link";
 import { useState } from "react";
 import TabFilter from "./TabFilter";
 import { pretendard } from "@/app/fonts";
-
-interface Post {
-  title: string;
-  frontmatter: Frontmatter;
-  fileName: string;
-}
+import type { Post } from "@/app/page";
 
 interface TabViewProps {
   posts: Post[];
@@ -47,7 +41,7 @@ export default function PostsList({ posts, tags, initialTag }: TabViewProps) {
             >
               <Link href={`/posts/${post.fileName}`} className="block">
                 <h3 className="text-lg font-semibold mb-2 text-[var(--color-text)] hover:text-[var(--color-primary)]">
-                  {post.title}
+                  {post.frontmatter.title}
                 </h3>
                 <div className="flex flex-wrap gap-4 text-sm text-[var(--color-text-secondary)]">
                   {post.frontmatter.date && (

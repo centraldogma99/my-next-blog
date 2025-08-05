@@ -72,7 +72,7 @@ export default function RootLayout({
       <head></head>
       <body className={`${pretendard.variable}`}>
         <ThemeProvider>
-          <header className="bg-[var(--color-bg-secondary)] border-b border-[var(--color-border)]">
+          <header className="bg-[var(--color-bg-secondary)] border-b border-[var(--color-border)] sticky top-0 z-50">
             <div className="container flex items-center justify-between h-16">
               <h1 className="text-xl font-semibold">
                 <Link
@@ -85,7 +85,7 @@ export default function RootLayout({
               <ThemeToggle />
             </div>
           </header>
-          <main className="container py-6">{children}</main>
+          <main className="container py-12">{children}</main>
         </ThemeProvider>
         <Analytics />
       </body>
