@@ -127,10 +127,10 @@ export default async function Post({
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
-      <article className="h-[calc(100vh_-_64px_-_var(--spacing)*24)]">
+      <article className="h-[calc(100vh_-_64px)]">
         <div className="grid lg:grid-cols-[1fr_3fr] gap-8 h-full">
           <TableOfContents content={content} className="py-4" />
-          <div className="py-6 h-full overflow-y-auto lg:col-start-2">
+          <div className="py-6 h-full overflow-y-auto lg:col-start-2 py-12">
             <h1>{frontmatter.title}</h1>
             <Markdown
               components={{
