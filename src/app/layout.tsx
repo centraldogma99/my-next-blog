@@ -85,7 +85,7 @@ export default function RootLayout({
               <ThemeToggle />
             </div>
           </header>
-          <main className="container py-12">{children}</main>
+          <main className="container">{children}</main>
         </ThemeProvider>
         <Analytics />
       </body>

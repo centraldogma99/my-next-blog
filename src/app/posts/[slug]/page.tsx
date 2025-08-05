@@ -44,34 +44,34 @@ export async function generateMetadata({
   params: Promise<{ slug: string }>;
 }): Promise<Metadata> {
   const { slug } = await params;
-  
+
   try {
     const data = await fetchPostContents(slug);
     const decodedContent = decodeBase64Content(data.content);
     const { frontmatter } = parseContent(decodedContent);
 
-  return {
-    title: frontmatter.title,
-    description:
-      frontmatter.description || `${frontmatter.title}에 대한 글입니다.`,
-    keywords: frontmatter.tag,
-    authors: [{ name: "Dogma" }],
-    openGraph: {
+    return {
       title: frontmatter.title,
       description:
         frontmatter.description || `${frontmatter.title}에 대한 글입니다.`,
-      type: "article",
-      publishedTime: frontmatter.date,
-      authors: ["Dogma"],
-      tags: frontmatter.tag,
-    },
-    twitter: {
-      card: "summary_large_image",
-      title: frontmatter.title,
-      description:
-        frontmatter.description || `${frontmatter.title}에 대한 글입니다.`,
-    },
-  };
+      keywords: frontmatter.tag,
+      authors: [{ name: "Dogma" }],
+      openGraph: {
+        title: frontmatter.title,
+        description:
+          frontmatter.description || `${frontmatter.title}에 대한 글입니다.`,
+        type: "article",
+        publishedTime: frontmatter.date,
+        authors: ["Dogma"],
+        tags: frontmatter.tag,
+      },
+      twitter: {
+        card: "summary_large_image",
+        title: frontmatter.title,
+        description:
+          frontmatter.description || `${frontmatter.title}에 대한 글입니다.`,
+      },
+    };
   } catch {
     return {
       title: "포스트를 찾을 수 없습니다",
@@ -86,14 +86,14 @@ export default async function Post({
   params: Promise<{ slug: string }>;
 }) {
   const { slug } = await params;
-  
+
   let data;
   try {
     data = await fetchPostContents(slug);
   } catch {
     notFound();
   }
-  
+
   const decodedContent = decodeBase64Content(data.content);
   const { content, frontmatter } = parseContent(decodedContent);
 
@@ -127,10 +127,10 @@ export default async function Post({
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
-      <article className="h-[calc(100vh_-_64px_-_var(--spacing)*24)]">
-        <div className="grid grid-cols-[1fr_3fr] gap-8 h-full">
-          <TableOfContents content={content} className="sticky top-16 py-4" />
-          <div className="py-6 h-full overflow-y-auto">
+      <article className="h-[calc(100vh_-_64px)]">
+        <div className="grid lg:grid-cols-[1fr_3fr] gap-8 h-full">
+          <TableOfContents content={content} className="py-4" />
+          <div className="py-6 h-full overflow-y-auto lg:col-start-2 py-12">
             <h1>{frontmatter.title}</h1>
             <Markdown
               components={{

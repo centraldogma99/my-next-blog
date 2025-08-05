@@ -11,8 +11,10 @@ describe('ThemeToggle', () => {
   it('다크 모드일 때 달 아이콘을 표시한다', () => {
     renderWithThemeProvider(<ThemeToggle />)
     
-    expect(screen.getByRole('button')).toHaveTextContent('🌙')
-    expect(screen.getByRole('button')).toHaveAttribute('title', '현재: 다크 모드')
+    const button = screen.getByRole('button')
+    // SVG 아이콘이 있는지 확인
+    expect(button.querySelector('svg')).toBeInTheDocument()
+    expect(button).toHaveAttribute('title', '현재: 다크 모드')
   })
 
   it('버튼 클릭 시 테마가 변경된다', () => {
@@ -22,7 +24,8 @@ describe('ThemeToggle', () => {
     
     fireEvent.click(button)
     
-    expect(button).toHaveTextContent('☀️')
+    // SVG 아이콘이 여전히 있는지 확인
+    expect(button.querySelector('svg')).toBeInTheDocument()
     expect(button).toHaveAttribute('title', '현재: 라이트 모드')
   })
 
@@ -34,7 +37,7 @@ describe('ThemeToggle', () => {
     fireEvent.click(button)
     fireEvent.click(button)
     
-    expect(button).toHaveTextContent('🌙')
+    expect(button.querySelector('svg')).toBeInTheDocument()
     expect(button).toHaveAttribute('title', '현재: 다크 모드')
   })
 
@@ -43,7 +46,7 @@ describe('ThemeToggle', () => {
     
     const button = screen.getByRole('button')
     
-    expect(button).toHaveClass('p-2', 'rounded-md', 'border', 'hover:bg-gray-100', 'dark:hover:bg-gray-800')
+    expect(button).toHaveClass('p-2', 'rounded-lg', 'bg-gray-100', 'hover:bg-gray-200', 'dark:bg-gray-800', 'dark:hover:bg-gray-700')
   })
 
   it('키보드 포커스가 가능하다', () => {
@@ -56,7 +59,8 @@ describe('ThemeToggle', () => {
     
     // 포커스된 상태에서 클릭도 가능해야 함
     fireEvent.click(button)
-    expect(button).toHaveTextContent('☀️')
+    expect(button.querySelector('svg')).toBeInTheDocument()
+    expect(button).toHaveAttribute('title', '현재: 라이트 모드')
   })
 
   it('접근성 속성이 올바르게 설정되어 있다', () => {

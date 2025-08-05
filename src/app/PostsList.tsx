@@ -20,7 +20,7 @@ export default function PostsList({ posts, tags, initialTag }: TabViewProps) {
     : posts;
 
   return (
-    <div className="grid grid-cols-1 lg:grid-cols-[250px_1fr] gap-6">
+    <div className="grid grid-cols-1 lg:grid-cols-[250px_1fr] gap-6 pt-12">
       <aside className="lg:sticky lg:top-6 lg:h-fit">
         <TabFilter
           tagAndCounts={tags}
@@ -29,7 +29,7 @@ export default function PostsList({ posts, tags, initialTag }: TabViewProps) {
           totalPosts={posts.length}
         />
       </aside>
-      <main className={pretendard.className}>
+      <div className={pretendard.className}>
         <h2 className="text-2xl font-bold mb-6 text-[var(--color-text)]">
           {selectedTag ? `${selectedTag} 포스트` : "모든 포스트"}
         </h2>
@@ -61,7 +61,7 @@ export default function PostsList({ posts, tags, initialTag }: TabViewProps) {
             </article>
           ))}
         </div>
-      </main>
+      </div>
     </div>
   );
 }
