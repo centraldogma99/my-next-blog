@@ -127,20 +127,15 @@ export function TableOfContents({ content, className }: TableOfContentsProps) {
       { rootMargin: `-${SCROLL_OFFSET}px 0px -80% 0px` },
     );
 
-    headings.forEach(({ id }) => {
-      const element = document.getElementById(id);
-      if (element) {
-        observer.observe(element);
-      }
-    });
+    // 모든 요소를 한 번에 수집하여 처리
+    const elements = headings
+      .map(({ id }) => document.getElementById(id))
+      .filter((element): element is HTMLElement => element !== null);
+
+    elements.forEach((element) => observer.observe(element));
 
     return () => {
-      headings.forEach(({ id }) => {
-        const element = document.getElementById(id);
-        if (element) {
-          observer.unobserve(element);
-        }
-      });
+      elements.forEach((element) => observer.unobserve(element));
     };
   }, [headings]);
 
