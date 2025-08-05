@@ -1,6 +1,9 @@
-import { CodeBlock, isSupportedLanguage } from "@/components/CodeBlock";
-import { HashScrollHandler } from "@/components/HashScrollHandler";
-import { HeadingWithAnchor } from "@/components/HeadingWithAnchor";
+import {
+  CodeBlock,
+  isSupportedLanguage,
+} from "@/app/posts/[slug]/(components)/CodeBlock";
+import { HashScrollHandler } from "@/app/posts/[slug]/(components)/HashScrollHandler";
+import { HeadingWithAnchor } from "@/app/posts/[slug]/(components)/HeadingWithAnchor";
 import type { GetContentsDetailData } from "@/types/githubAPI/getContentsDetail";
 import { fetchBlogPostsGithubAPI } from "@/utils/fetchGithubAPI";
 import { parseContent } from "@/utils/parseFrontmatter";
@@ -8,7 +11,7 @@ import type { ReactNode } from "react";
 import React from "react";
 import Markdown from "react-markdown";
 import type { Metadata } from "next";
-import { TableOfContents } from "@/components/TableOfContents";
+import { TableOfContents } from "@/app/posts/[slug]/(components)/TableOfContents";
 import { decodeBase64Content } from "@/utils/decodeBase64Content";
 import { notFound } from "next/navigation";
 
@@ -130,7 +133,7 @@ export default async function Post({
       <article className="h-[calc(100vh_-_64px)]">
         <div className="grid lg:grid-cols-[1fr_3fr] gap-8 h-full">
           <TableOfContents content={content} className="py-4" />
-          <div className="py-6 h-full overflow-y-auto lg:col-start-2 py-12">
+          <div className="py-6 h-full overflow-y-auto lg:col-start-2 pt-12 pb-24">
             <h1>{frontmatter.title}</h1>
             <Markdown
               components={{

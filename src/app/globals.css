@@ -94,4 +94,7 @@ html.light .shiki span {
   ul {
     @apply my-6 ml-6 list-disc [&>li]:mt-2;
   }
+  ol {
+    @apply my-6 ml-6 list-decimal [&>li]:mt-2;
+  }
 }

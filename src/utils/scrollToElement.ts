@@ -1,4 +1,4 @@
-import { SCROLL_OFFSET } from "@/components/HeadingWithAnchor";
+import { SCROLL_OFFSET } from "@/app/posts/[slug]/(components)/HeadingWithAnchor";
 
 export const scrollToElement = (elementId: string, offset = SCROLL_OFFSET) => {
   const element = document.getElementById(elementId);
