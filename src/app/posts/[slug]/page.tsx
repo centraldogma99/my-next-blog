@@ -1,22 +1,19 @@
 import { CodeBlock, isSupportedLanguage } from "@/components/CodeBlock";
 import { HashScrollHandler } from "@/components/HashScrollHandler";
 import { HeadingWithAnchor } from "@/components/HeadingWithAnchor";
-import type { GetContentsDetailResponse } from "@/types/githubAPI/getContentsDetail";
-import { decodeBase64Content } from "@/utils/decodeBase64Content";
+import type { GetContentsDetailData } from "@/types/githubAPI/getContentsDetail";
 import { fetchBlogPostsGithubAPI } from "@/utils/fetchGithubAPI";
-import { parseFrontmatter } from "@/utils/parseFrontmatter";
+import { parseContent } from "@/utils/parseFrontmatter";
 import type { ReactNode } from "react";
 import React from "react";
 import Markdown from "react-markdown";
 import type { Metadata } from "next";
 import { TableOfContents } from "@/components/TableOfContents";
+import { decodeBase64Content } from "@/utils/decodeBase64Content";
+import { notFound } from "next/navigation";
 
-const fetchPostContents = async (slug: string) => {
-  const data = await fetchBlogPostsGithubAPI<GetContentsDetailResponse>(
-    `/contents/${slug}`,
-  );
-  return decodeBase64Content(data.content);
-};
+const fetchPostContents = (slug: string) =>
+  fetchBlogPostsGithubAPI<GetContentsDetailData>(`/contents/${slug}`);
 
 const getChildrenCodeTag = (node: ReactNode) => {
   if (!node || React.Children.count(node) !== 1) return false;
@@ -47,8 +44,11 @@ export async function generateMetadata({
   params: Promise<{ slug: string }>;
 }): Promise<Metadata> {
   const { slug } = await params;
-  const contents = await fetchPostContents(slug);
-  const { frontmatter } = parseFrontmatter(contents);
+  
+  try {
+    const data = await fetchPostContents(slug);
+    const decodedContent = decodeBase64Content(data.content);
+    const { frontmatter } = parseContent(decodedContent);
 
   return {
     title: frontmatter.title,
@@ -72,6 +72,12 @@ export async function generateMetadata({
         frontmatter.description || `${frontmatter.title}에 대한 글입니다.`,
     },
   };
+  } catch {
+    return {
+      title: "포스트를 찾을 수 없습니다",
+      description: "요청하신 포스트가 존재하지 않거나 삭제되었을 수 있습니다.",
+    };
+  }
 }
 
 export default async function Post({
@@ -80,8 +86,20 @@ export default async function Post({
   params: Promise<{ slug: string }>;
 }) {
   const { slug } = await params;
-  const contents = await fetchPostContents(slug);
-  const { content, frontmatter } = parseFrontmatter(contents);
+  
+  let data;
+  try {
+    data = await fetchPostContents(slug);
+  } catch {
+    notFound();
+  }
+  
+  const decodedContent = decodeBase64Content(data.content);
+  const { content, frontmatter } = parseContent(decodedContent);
+
+  if (frontmatter.draft) {
+    notFound();
+  }
 
   const jsonLd = {
     "@context": "https://schema.org",

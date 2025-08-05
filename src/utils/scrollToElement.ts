@@ -1,22 +1,25 @@
-export const scrollToElement = (elementId: string, offset = 80) => {
+import { SCROLL_OFFSET } from "@/components/HeadingWithAnchor";
+
+export const scrollToElement = (elementId: string, offset = SCROLL_OFFSET) => {
   const element = document.getElementById(elementId);
-  if (!element) return;
+  const parentElement = element?.parentElement;
+  if (!element || !parentElement) return;
 
   const elementPosition = element.getBoundingClientRect().top;
-  const offsetPosition = elementPosition + window.scrollY - offset;
+  const offsetPosition = elementPosition + parentElement.scrollTop - offset;
 
-  window.scrollTo({
+  parentElement.scrollTo({
     top: offsetPosition,
     behavior: "smooth",
   });
 };
 
-export const scrollToHash = (hash: string, offset = 80) => {
+export const scrollToHash = (hash: string, offset = SCROLL_OFFSET) => {
   if (!hash) return;
-  
+
   const id = hash.startsWith("#") ? hash.substring(1) : hash;
-  
+
   const decodedId = decodeURIComponent(id);
-  
+
   scrollToElement(decodedId, offset);
 };

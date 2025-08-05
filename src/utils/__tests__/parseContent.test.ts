@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { parseFrontmatter, isValidFrontmatter } from "../parseFrontmatter";
+import { parseContent, isValidFrontmatter } from "../parseFrontmatter";
 
 describe("parseFrontmatter", () => {
   it("유효한 frontmatter를 파싱한다", () => {
@@ -16,7 +16,7 @@ tag:
 
 이것은 테스트 내용입니다.`;
 
-    const result = parseFrontmatter(markdown);
+    const result = parseContent(markdown);
 
     expect(result.frontmatter).toEqual({
       title: "테스트 포스트",
@@ -39,7 +39,7 @@ tag:
 
 내용`;
 
-    const result = parseFrontmatter(markdown);
+    const result = parseContent(markdown);
 
     expect(result.frontmatter.subtitle).toBe("부제목");
   });
@@ -55,7 +55,7 @@ tag:
 
 내용`;
 
-    const result = parseFrontmatter(markdown);
+    const result = parseContent(markdown);
 
     expect(result.frontmatter.draft).toBe(true);
   });
@@ -63,7 +63,7 @@ tag:
   it("frontmatter가 없으면 에러를 던진다", () => {
     const markdown = "# 제목\n\n내용";
 
-    expect(() => parseFrontmatter(markdown)).toThrow("Invalid frontmatter");
+    expect(() => parseContent(markdown)).toThrow("Invalid frontmatter");
   });
 
   it("필수 필드가 없으면 에러를 던진다", () => {
@@ -73,7 +73,7 @@ title: "테스트"
 
 내용`;
 
-    expect(() => parseFrontmatter(markdown)).toThrow("Invalid frontmatter");
+    expect(() => parseContent(markdown)).toThrow("Invalid frontmatter");
   });
 
   it("따옴표 없는 제목을 올바르게 파싱한다", () => {
@@ -88,7 +88,7 @@ tag:
 
 내용`;
 
-    const result = parseFrontmatter(markdown);
+    const result = parseContent(markdown);
 
     expect(result.frontmatter.title).toBe(
       "React Router loader와 Tanstack Query를 활용한 사용자 상태에 따른 리다이렉트 구현하기",
@@ -108,7 +108,7 @@ tag:
 
 내용`;
 
-    const result = parseFrontmatter(markdown);
+    const result = parseContent(markdown);
 
     expect(result.frontmatter.subtitle).toBe("");
     expect(result.frontmatter.title).toBe("테스트 제목");
@@ -127,7 +127,7 @@ tag:
 
 내용`;
 
-    const result = parseFrontmatter(markdown);
+    const result = parseContent(markdown);
 
     expect(result.frontmatter.title).toBe("작은 따옴표 제목");
     expect(result.frontmatter.subtitle).toBe("큰 따옴표 부제목");
@@ -147,7 +147,7 @@ tag:
 
 내용`;
 
-    const result = parseFrontmatter(markdown);
+    const result = parseContent(markdown);
 
     expect(result.frontmatter.title).toBe(
       "JavaScript의 \"this\" 키워드와 '화살표 함수' 이해하기",
@@ -172,7 +172,7 @@ tag:
 
 내용`;
 
-    const result = parseFrontmatter(markdown);
+    const result = parseContent(markdown);
 
     expect(result.frontmatter.title).toBe(
       "JavaScript의 'this' 키워드와 \"화살표 함수\" 이해하기",

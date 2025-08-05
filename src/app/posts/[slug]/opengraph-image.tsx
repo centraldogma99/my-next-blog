@@ -1,8 +1,8 @@
 import { ImageResponse } from "next/og";
 import { fetchBlogPostsGithubAPI } from "@/utils/fetchGithubAPI";
+import { parseContent } from "@/utils/parseFrontmatter";
+import type { GetContentsDetailData } from "@/types/githubAPI/getContentsDetail";
 import { decodeBase64Content } from "@/utils/decodeBase64Content";
-import { parseFrontmatter } from "@/utils/parseFrontmatter";
-import type { GetContentsDetailResponse } from "@/types/githubAPI/getContentsDetail";
 
 export const runtime = "edge";
 
@@ -20,11 +20,11 @@ export default async function Image({
 }) {
   const { slug } = await params;
 
-  const data = await fetchBlogPostsGithubAPI<GetContentsDetailResponse>(
+  const data = await fetchBlogPostsGithubAPI<GetContentsDetailData>(
     `/contents/${slug}`,
   );
-  const contents = decodeBase64Content(data.content);
-  const { frontmatter } = parseFrontmatter(contents);
+  const decodedContent = decodeBase64Content(data.content);
+  const { frontmatter } = parseContent(decodedContent);
   const title = frontmatter.title;
 
   return new ImageResponse(

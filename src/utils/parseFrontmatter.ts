@@ -3,7 +3,7 @@ interface ParseResult {
   content: string;
 }
 
-export function parseFrontmatter(markdownContent: string): ParseResult {
+export function parseContent(markdownContent: string): ParseResult {
   const frontmatterRegex = /^---\s*\n([\s\S]*?)\n---\s*\n([\s\S]*)$/;
   const match = markdownContent.match(frontmatterRegex);
 

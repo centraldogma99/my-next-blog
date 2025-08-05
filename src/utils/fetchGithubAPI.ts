@@ -1,3 +1,5 @@
+import { notFound } from "next/navigation";
+
 export const fetchBlogPostsGithubAPI = async <T>(url: string) => {
   const response = await fetch(
     `https://api.github.com/repos/centraldogma99/dogma-blog-posts${url}`,
@@ -8,5 +10,13 @@ export const fetchBlogPostsGithubAPI = async <T>(url: string) => {
       },
     },
   );
-  return (await response.json()) as T;
+  const data = await response.json();
+  if ("message" in data) {
+    if (data.message.includes("Not Found")) {
+      notFound();
+    } else {
+      throw new Error(data.message);
+    }
+  }
+  return data as T;
 };

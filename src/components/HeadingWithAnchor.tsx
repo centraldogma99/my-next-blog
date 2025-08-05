@@ -1,6 +1,7 @@
 "use client";
 
 import { generateSlug } from "@/utils/generateSlug";
+import { scrollToElement } from "@/utils/scrollToElement";
 import React, { type ReactNode } from "react";
 
 interface HeadingWithAnchorProps {
@@ -8,6 +9,9 @@ interface HeadingWithAnchorProps {
   children: ReactNode;
   className?: string;
 }
+
+// 헤더(64px) + main 패딩(48px) + 24px
+export const SCROLL_OFFSET = 136;
 
 /**
  * 부모 요소를 자신의 위치로 스크롤 이동. (element.parentElement로 참조)
@@ -24,19 +28,9 @@ export function HeadingWithAnchor({
     e.preventDefault();
     const element = document.getElementById(id);
     if (element) {
-      // 헤더(64px) + main 패딩(48px) + 24px
-      const offset = 136;
-      const elementPosition = element.getBoundingClientRect().top;
-      const parentElement = element.parentElement;
-      const offsetPosition =
-        elementPosition + parentElement!.scrollTop - offset;
+      scrollToElement(id);
 
-      parentElement?.scrollTo({
-        top: offsetPosition,
-        behavior: "smooth",
-      });
-
-      window.history.pushState(null, "", `#${id}`);
+      window.history.pushState(null, "", `#${encodeURIComponent(id)}`);
     }
   };
 
@@ -45,7 +39,7 @@ export function HeadingWithAnchor({
     className: `group ${className || ""}`,
     children: (
       <a
-        href={`#${id}`}
+        href={`#${encodeURIComponent(id)}`}
         onClick={handleClick}
         className="no-underline hover:underline text-inherit"
         aria-label={`${text} 섹션으로 이동`}

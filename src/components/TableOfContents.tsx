@@ -1,14 +1,9 @@
 "use client";
 
+import { SCROLL_OFFSET } from "@/components/HeadingWithAnchor";
 import { generateSlug } from "@/utils/generateSlug";
 import { scrollToElement } from "@/utils/scrollToElement";
-import { useEffect, useState } from "react";
-
-interface TocItem {
-  id: string;
-  text: string;
-  level: number;
-}
+import { useEffect, useMemo, useState } from "react";
 
 interface TableOfContentsProps {
   content: string;
@@ -16,22 +11,18 @@ interface TableOfContentsProps {
 }
 
 export function TableOfContents({ content, className }: TableOfContentsProps) {
-  const [headings, setHeadings] = useState<TocItem[]>([]);
   const [activeId, setActiveId] = useState<string>("");
 
-  useEffect(() => {
+  const headings = useMemo(() => {
     const headingRegex = /^(#{1,6})\s+(.+)$/gm;
     const matches = [...content.matchAll(headingRegex)];
-
-    const tocItems = matches.map((match) => {
+    return matches.map((match) => {
       const level = match[1].length;
       const text = match[2];
       const id = generateSlug(text);
 
       return { id, text, level };
     });
-
-    setHeadings(tocItems);
   }, [content]);
 
   useEffect(() => {
@@ -43,7 +34,7 @@ export function TableOfContents({ content, className }: TableOfContentsProps) {
           }
         });
       },
-      { rootMargin: "-80px 0px -80% 0px" },
+      { rootMargin: `-${SCROLL_OFFSET}px 0px -80% 0px` },
     );
 
     headings.forEach(({ id }) => {
@@ -66,7 +57,8 @@ export function TableOfContents({ content, className }: TableOfContentsProps) {
   const handleClick = (e: React.MouseEvent<HTMLAnchorElement>, id: string) => {
     e.preventDefault();
     scrollToElement(id);
-    window.history.pushState(null, "", `#${id}`);
+    // preventDefault 때문에 이 처리를 추가로 해 줘야 함
+    window.history.pushState(null, "", `#${encodeURIComponent(id)}`);
   };
 
   if (headings.length === 0) return null;
@@ -92,7 +84,7 @@ export function TableOfContents({ content, className }: TableOfContentsProps) {
             }
           >
             <a
-              href={`#${heading.id}`}
+              href={`#${encodeURIComponent(heading.id)}`}
               onClick={(e) => handleClick(e, heading.id)}
               className={`block py-1 hover:text-blue-600 transition-colors ${
                 activeId === heading.id
