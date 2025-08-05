@@ -1,6 +1,6 @@
 "use client";
 
-import { SCROLL_OFFSET } from "@/components/HeadingWithAnchor";
+import { SCROLL_OFFSET } from "@/app/posts/[slug]/(components)/HeadingWithAnchor";
 import { generateSlug } from "@/utils/generateSlug";
 import { scrollToElement } from "@/utils/scrollToElement";
 import { useEffect, useMemo, useState } from "react";
