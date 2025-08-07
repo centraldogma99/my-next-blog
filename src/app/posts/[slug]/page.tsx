@@ -4,19 +4,14 @@ import {
 } from "@/app/posts/[slug]/(components)/CodeBlock";
 import { HashScrollHandler } from "@/app/posts/[slug]/(components)/HashScrollHandler";
 import { HeadingWithAnchor } from "@/app/posts/[slug]/(components)/HeadingWithAnchor";
-import type { GetContentsDetailData } from "@/types/githubAPI/getContentsDetail";
-import { fetchBlogPostsGithubAPI } from "@/utils/fetchGithubAPI";
-import { parseContent } from "@/utils/parseFrontmatter";
+import { fetchSingleBlogPost, isPostPublished } from "@/utils/githubBlogPost";
 import type { ReactNode } from "react";
 import React from "react";
 import Markdown from "react-markdown";
 import type { Metadata } from "next";
 import { TableOfContents } from "@/app/posts/[slug]/(components)/TableOfContents";
-import { decodeBase64Content } from "@/utils/decodeBase64Content";
 import { notFound } from "next/navigation";
 
-const fetchPostContents = (slug: string) =>
-  fetchBlogPostsGithubAPI<GetContentsDetailData>(`/contents/${slug}`);
 
 const getChildrenCodeTag = (node: ReactNode) => {
   if (!node || React.Children.count(node) !== 1) return false;
@@ -49,9 +44,8 @@ export async function generateMetadata({
   const { slug } = await params;
 
   try {
-    const data = await fetchPostContents(slug);
-    const decodedContent = decodeBase64Content(data.content);
-    const { frontmatter } = parseContent(decodedContent);
+    const post = await fetchSingleBlogPost(slug, false);
+    const { frontmatter } = post;
 
     return {
       title: frontmatter.title,
@@ -90,17 +84,20 @@ export default async function Post({
 }) {
   const { slug } = await params;
 
-  let data;
+  let post;
   try {
-    data = await fetchPostContents(slug);
+    post = await fetchSingleBlogPost(slug, true);
   } catch {
     notFound();
   }
 
-  const decodedContent = decodeBase64Content(data.content);
-  const { content, frontmatter } = parseContent(decodedContent);
+  const { content, frontmatter } = post;
 
-  if (frontmatter.draft) {
+  if (!isPostPublished(post)) {
+    notFound();
+  }
+
+  if (!content) {
     notFound();
   }
 

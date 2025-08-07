@@ -4,10 +4,10 @@ import Link from "next/link";
 import { useState } from "react";
 import TabFilter from "./TabFilter";
 import { pretendard } from "@/app/fonts";
-import type { Post } from "@/app/page";
+import type { BlogPost } from "@/utils/githubBlogPost";
 
 interface TabViewProps {
-  posts: Post[];
+  posts: BlogPost[];
   tags: Record<string, number>;
   initialTag: string | null;
 }
