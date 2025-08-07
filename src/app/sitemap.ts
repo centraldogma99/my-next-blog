@@ -1,25 +1,18 @@
 import { MetadataRoute } from "next";
-import type { GetContentsResponse } from "@/types/githubAPI/getContents";
-import { fetchBlogPostsGithubAPI } from "@/utils/fetchGithubAPI";
+import { fetchBlogPosts } from "@/utils/githubBlogPost";
 import { DOMAIN } from "@/constants/domain";
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const baseUrl = DOMAIN;
 
-  // 블로그 포스트 목록 가져오기
-  const postsListData =
-    await fetchBlogPostsGithubAPI<GetContentsResponse[]>("/contents");
+  // 블로그 포스트 목록 가져오기 (draft 제외)
+  const posts = await fetchBlogPosts({ includeDrafts: false });
 
-  const posts = postsListData
-    .filter(
-      (githubFile: GetContentsResponse) =>
-        githubFile.name.endsWith(".md") || githubFile.name.endsWith(".mdx")
-    )
-    .map((post) => ({
-      url: `${baseUrl}/posts/${post.name}`,
-      changeFrequency: "weekly" as const,
-      priority: 0.8,
-    }));
+  const postUrls = posts.map((post) => ({
+    url: `${baseUrl}/posts/${post.fileName}`,
+    changeFrequency: "weekly" as const,
+    priority: 0.8,
+  }));
 
   return [
     {
@@ -27,6 +20,6 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       changeFrequency: "daily",
       priority: 1,
     },
-    ...posts,
+    ...postUrls,
   ];
 }
