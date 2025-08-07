@@ -1,5 +1,6 @@
 import { ImageResponse } from "next/og";
 import { fetchSingleBlogPost } from "@/utils/githubBlogPost";
+import { SITE_NAME } from "@/constants/site";
 
 export const runtime = "edge";
 
@@ -44,7 +45,7 @@ export default async function Image({
             marginBottom: 20,
           }}
         >
-          Dogma Blog
+          {SITE_NAME}
         </div>
         <div
           style={{
