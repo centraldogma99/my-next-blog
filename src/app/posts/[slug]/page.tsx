@@ -12,6 +12,7 @@ import Markdown from "react-markdown";
 import type { Metadata } from "next";
 import { TableOfContents } from "@/app/posts/[slug]/(components)/TableOfContents";
 import { notFound } from "next/navigation";
+import Script from "next/script";
 
 
 const getChildrenCodeTag = (node: ReactNode) => {
@@ -124,8 +125,10 @@ export default async function Post({
   return (
     <>
       <HashScrollHandler />
-      <script
+      <Script
+        id="json-ld"
         type="application/ld+json"
+        strategy="beforeInteractive"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
       <article className="h-[calc(100vh_-_64px)]">
