@@ -7,17 +7,18 @@ import { ThemeProvider } from "@/contexts/ThemeContext";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { DEFAULT_THEME } from "@/constants/theme";
 import { DOMAIN } from "@/constants/domain";
+import { SITE_NAME, AUTHOR_NAME, SITE_DESCRIPTION, SITE_KEYWORDS } from "@/constants/site";
 
 export const metadata: Metadata = {
   title: {
-    default: "Dogma Blog",
-    template: "%s | Dogma Blog",
+    default: SITE_NAME,
+    template: `%s | ${SITE_NAME}`,
   },
-  description: "기술, 개발 관련 내용을 기록하는 Dogma의 블로그입니다.",
-  keywords: ["블로그", "개발", "프로그래밍", "기술", "Dogma"],
-  authors: [{ name: "Dogma" }],
-  creator: "Dogma",
-  publisher: "Dogma",
+  description: SITE_DESCRIPTION,
+  keywords: SITE_KEYWORDS,
+  authors: [{ name: AUTHOR_NAME }],
+  creator: AUTHOR_NAME,
+  publisher: AUTHOR_NAME,
   formatDetection: {
     email: false,
     address: false,
@@ -27,22 +28,22 @@ export const metadata: Metadata = {
     type: "website",
     locale: "ko_KR",
     url: DOMAIN,
-    siteName: "Dogma Blog",
-    title: "Dogma Blog",
-    description: "기술, 개발, 그리고 일상을 기록하는 Dogma의 블로그입니다.",
+    siteName: SITE_NAME,
+    title: SITE_NAME,
+    description: SITE_DESCRIPTION,
     images: [
       {
         url: "/opengraph-image",
         width: 1200,
         height: 630,
-        alt: "Dogma Blog",
+        alt: SITE_NAME,
       },
     ],
   },
   twitter: {
     card: "summary_large_image",
-    title: "Dogma Blog",
-    description: "기술, 개발, 그리고 일상을 기록하는 Dogma의 블로그입니다.",
+    title: SITE_NAME,
+    description: SITE_DESCRIPTION,
     images: ["/opengraph-image"],
   },
   robots: {
@@ -72,14 +73,14 @@ export default function RootLayout({
       <head></head>
       <body className={`${pretendard.variable}`}>
         <ThemeProvider>
-          <header className="bg-[var(--color-bg-secondary)] border-b border-[var(--color-border)] sticky top-0 z-50">
+          <header className="bg-[var(--color-bg-secondary)] border-b border-[var(--color-border)]">
             <div className="container flex items-center justify-between h-16">
               <h1 className="text-xl font-semibold">
                 <Link
                   href="/"
                   className="text-[var(--color-text)] hover:text-[var(--color-text)] no-underline hover:underline-0 cursor-pointer"
                 >
-                  Dogma Blog
+                  {SITE_NAME}
                 </Link>
               </h1>
               <ThemeToggle />

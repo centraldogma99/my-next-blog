@@ -5,6 +5,7 @@ import {
 import { HashScrollHandler } from "@/app/posts/[slug]/(components)/HashScrollHandler";
 import { HeadingWithAnchor } from "@/app/posts/[slug]/(components)/HeadingWithAnchor";
 import { fetchSingleBlogPost, isPostPublished } from "@/utils/githubBlogPost";
+import { AUTHOR_NAME } from "@/constants/site";
 import type { ReactNode } from "react";
 import React from "react";
 import Markdown from "react-markdown";
@@ -52,14 +53,14 @@ export async function generateMetadata({
       description:
         frontmatter.description || `${frontmatter.title}에 대한 글입니다.`,
       keywords: frontmatter.tag,
-      authors: [{ name: "Dogma" }],
+      authors: [{ name: AUTHOR_NAME }],
       openGraph: {
         title: frontmatter.title,
         description:
           frontmatter.description || `${frontmatter.title}에 대한 글입니다.`,
         type: "article",
         publishedTime: frontmatter.date,
-        authors: ["Dogma"],
+        authors: [AUTHOR_NAME],
         tags: frontmatter.tag,
       },
       twitter: {
@@ -111,11 +112,11 @@ export default async function Post({
     dateModified: frontmatter.date,
     author: {
       "@type": "Person",
-      name: "Dogma",
+      name: AUTHOR_NAME,
     },
     publisher: {
       "@type": "Person",
-      name: "Dogma",
+      name: AUTHOR_NAME,
     },
     keywords: frontmatter.tag.join(", "),
   };
