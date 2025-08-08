@@ -45,7 +45,7 @@ export async function generateMetadata({
   const { slug } = await params;
 
   try {
-    const post = await fetchSingleBlogPost(slug, false);
+    const post = await fetchSingleBlogPost(`${slug}.md`, false);
     const { frontmatter } = post;
 
     return {
@@ -87,7 +87,7 @@ export default async function Post({
 
   let post;
   try {
-    post = await fetchSingleBlogPost(slug, true);
+    post = await fetchSingleBlogPost(`${slug}.md`, true);
   } catch {
     notFound();
   }
