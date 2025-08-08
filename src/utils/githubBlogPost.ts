@@ -27,7 +27,7 @@ const isMarkdownFile = (fileName: string): boolean => {
  * 블로그 포스트 목록을 가져와서 처리
  */
 export async function fetchBlogPosts(
-  options: FetchPostsOptions = {}
+  options: FetchPostsOptions = {},
 ): Promise<BlogPost[]> {
   const {
     includeDrafts = false,
@@ -37,11 +37,11 @@ export async function fetchBlogPosts(
 
   // GitHub에서 파일 목록 가져오기
   const postsListData =
-    await fetchBlogPostsGithubAPI<GetContentsResponse[]>("/contents");
+    await fetchBlogPostsGithubAPI<GetContentsResponse[]>("/contents/posts");
 
   // 마크다운 파일만 필터링
   const markdownFiles = postsListData.filter((file) =>
-    isMarkdownFile(file.name)
+    isMarkdownFile(file.name),
   );
 
   // 각 파일의 상세 정보 가져오기
@@ -49,7 +49,7 @@ export async function fetchBlogPosts(
     markdownFiles.map(async (file) => {
       const postData = await fetchSingleBlogPost(file.name, includeContent);
       return postData;
-    })
+    }),
   );
 
   // draft 필터링
@@ -74,10 +74,10 @@ export async function fetchBlogPosts(
  */
 export async function fetchSingleBlogPost(
   fileName: string,
-  includeContent = true
+  includeContent = true,
 ): Promise<BlogPost> {
   const data = await fetchBlogPostsGithubAPI<GetContentsDetailData>(
-    `/contents/${fileName}`
+    `/contents/posts/${fileName}`,
   );
 
   const decodedContent = decodeBase64Content(data.content);
