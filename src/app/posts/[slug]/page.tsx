@@ -12,7 +12,7 @@ import Markdown from "react-markdown";
 import type { Metadata } from "next";
 import { TableOfContents } from "@/app/posts/[slug]/(components)/TableOfContents";
 import { notFound } from "next/navigation";
-
+import Script from "next/script";
 
 const getChildrenCodeTag = (node: ReactNode) => {
   if (!node || React.Children.count(node) !== 1) return false;
@@ -124,70 +124,80 @@ export default async function Post({
   return (
     <>
       <HashScrollHandler />
-      <script
+      <Script
+        id="json-ld"
         type="application/ld+json"
+        strategy="beforeInteractive"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
-      <article className="h-[calc(100vh_-_64px)]">
-        <div className="grid lg:grid-cols-[1fr_3fr] gap-8 h-full">
-          <TableOfContents content={content} className="py-4" />
-          <div className="py-6 h-full overflow-y-auto lg:col-start-2 pt-12 pb-24">
-            <h1>{frontmatter.title}</h1>
-            <Markdown
-              components={{
-                h1: ({ children }) => (
-                  <HeadingWithAnchor level={1} className="mt-30">
-                    {children}
-                  </HeadingWithAnchor>
-                ),
-                h2: ({ children }) => (
-                  <HeadingWithAnchor level={2} className="mt-24">
-                    {children}
-                  </HeadingWithAnchor>
-                ),
-                h3: ({ children }) => (
-                  <HeadingWithAnchor level={3} className="mt-16">
-                    {children}
-                  </HeadingWithAnchor>
-                ),
-                h4: ({ children }) => (
-                  <HeadingWithAnchor level={4} className="mt-12">
-                    {children}
-                  </HeadingWithAnchor>
-                ),
-                img: ({ src, alt, ...props }) => (
-                  // eslint-disable-next-line @next/next/no-img-element
-                  <img
-                    src={src}
-                    alt={alt || "블로그 이미지"}
-                    loading="lazy"
-                    {...props}
-                  />
-                ),
-                pre: (props) => {
-                  const codeElement = getChildrenCodeTag(props.children);
-                  if (!codeElement || !isValidCodeElement(codeElement))
-                    return <pre>{props.children}</pre>;
+      <article className="max-w-full">
+        <div className="lg:flex lg:gap-2 relative max-w-full">
+          <TableOfContents
+            content={content}
+            className="py-4 w-[280px] hidden lg:block lg:sticky lg:top-20 lg:overflow-y-auto lg:self-start flex-shrink-0"
+          />
+          <div className="flex-1 py-6 pt-12 pb-24 px-6 min-w-0">
+            <div className="max-w-4xl mx-auto">
+              <h1 className="break-keep">{frontmatter.title}</h1>
+              <Markdown
+                components={{
+                  h1: ({ children }) => (
+                    <HeadingWithAnchor level={1} className="mt-30">
+                      {children}
+                    </HeadingWithAnchor>
+                  ),
+                  h2: ({ children }) => (
+                    <HeadingWithAnchor level={2} className="mt-24">
+                      {children}
+                    </HeadingWithAnchor>
+                  ),
+                  h3: ({ children }) => (
+                    <HeadingWithAnchor level={3} className="mt-16">
+                      {children}
+                    </HeadingWithAnchor>
+                  ),
+                  h4: ({ children }) => (
+                    <HeadingWithAnchor level={4} className="mt-12">
+                      {children}
+                    </HeadingWithAnchor>
+                  ),
+                  img: ({ src, alt, ...props }) => (
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img
+                      src={src}
+                      alt={alt || "블로그 이미지"}
+                      loading="lazy"
+                      {...props}
+                    />
+                  ),
+                  pre: (props) => {
+                    const codeElement = getChildrenCodeTag(props.children);
+                    if (!codeElement || !isValidCodeElement(codeElement))
+                      return <pre>{props.children}</pre>;
 
-                  // 타입 가드를 통과했으므로 안전하게 접근 가능
-                  const codeProps = codeElement.props as {
-                    className: string;
-                    children: React.ReactNode;
-                  };
-                  const language = codeProps.className.replace("language-", "");
-
-                  if (language && isSupportedLanguage(language))
-                    return (
-                      <CodeBlock language={language}>
-                        {String(codeProps.children)}
-                      </CodeBlock>
+                    // 타입 가드를 통과했으므로 안전하게 접근 가능
+                    const codeProps = codeElement.props as {
+                      className: string;
+                      children: React.ReactNode;
+                    };
+                    const language = codeProps.className.replace(
+                      "language-",
+                      "",
                     );
-                  else return <pre>{props.children}</pre>;
-                },
-              }}
-            >
-              {content}
-            </Markdown>
+
+                    if (language && isSupportedLanguage(language))
+                      return (
+                        <CodeBlock language={language}>
+                          {String(codeProps.children)}
+                        </CodeBlock>
+                      );
+                    else return <pre>{props.children}</pre>;
+                  },
+                }}
+              >
+                {content}
+              </Markdown>
+            </div>
           </div>
         </div>
       </article>

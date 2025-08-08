@@ -7,7 +7,12 @@ import { ThemeProvider } from "@/contexts/ThemeContext";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { DEFAULT_THEME } from "@/constants/theme";
 import { DOMAIN } from "@/constants/domain";
-import { SITE_NAME, AUTHOR_NAME, SITE_DESCRIPTION, SITE_KEYWORDS } from "@/constants/site";
+import {
+  SITE_NAME,
+  AUTHOR_NAME,
+  SITE_DESCRIPTION,
+  SITE_KEYWORDS,
+} from "@/constants/site";
 
 export const metadata: Metadata = {
   title: {
@@ -73,20 +78,18 @@ export default function RootLayout({
       <head></head>
       <body className={`${pretendard.variable}`}>
         <ThemeProvider>
-          <header className="bg-[var(--color-bg-secondary)] border-b border-[var(--color-border)]">
-            <div className="container flex items-center justify-between h-16">
-              <h1 className="text-xl font-semibold">
-                <Link
-                  href="/"
-                  className="text-[var(--color-text)] hover:text-[var(--color-text)] no-underline hover:underline-0 cursor-pointer"
-                >
-                  {SITE_NAME}
-                </Link>
-              </h1>
-              <ThemeToggle />
-            </div>
+          <header className="bg-[var(--color-bg-secondary)] border-b border-[var(--color-border)] flex items-center justify-between h-16 px-8 fixed top-0 left-0 right-0 z-50">
+            <h1 className="text-xl font-semibold">
+              <Link
+                href="/"
+                className="text-[var(--color-text)] hover:text-[var(--color-text)] no-underline hover:underline-0 cursor-pointer"
+              >
+                {SITE_NAME}
+              </Link>
+            </h1>
+            <ThemeToggle />
           </header>
-          <main className="container">{children}</main>
+          <main className="pt-16">{children}</main>
         </ThemeProvider>
         <Analytics />
       </body>

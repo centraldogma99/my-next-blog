@@ -157,7 +157,7 @@ export function TableOfContents({ content, className }: TableOfContentsProps) {
   return (
     <>
       {/* 데스크톱 TOC */}
-      <nav className={`hidden lg:block overflow-y-auto py-12 ${className}`}>
+      <nav className={`hidden lg:block ${className}`}>
         <TocList
           headings={headings}
           activeId={activeId}
