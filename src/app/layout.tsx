@@ -64,7 +64,7 @@ export const metadata: Metadata = {
     },
   },
   verification: {
-    google: "zIXlP_nEMHeMayTwzohtA8sPvi8XQtA4Z2JW77bH42U", // Google Search Console에서 받은 인증 코드
+    google: "tM0bQCuem6ovQoUH1IFXs0ctwphtKyqD_5BN28ahlaY", // Google Search Console에서 받은 인증 코드
     // yandex: "your-yandex-verification-code",
   },
 };
@@ -76,12 +76,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="ko" className={DEFAULT_THEME}>
-      <head>
-        <meta
-          name="google-site-verification"
-          content="tM0bQCuem6ovQoUH1IFXs0ctwphtKyqD_5BN28ahlaY"
-        />
-      </head>
+      <head></head>
       <body className={`${pretendard.variable}`}>
         <ThemeProvider>
           <header className="bg-[var(--color-bg-secondary)] border-b border-[var(--color-border)] flex items-center justify-between h-16 px-8 fixed top-0 left-0 right-0 z-50">
