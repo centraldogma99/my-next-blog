@@ -13,6 +13,7 @@ import {
   SITE_DESCRIPTION,
   SITE_KEYWORDS,
 } from "@/constants/site";
+import { SpeedInsights } from "@vercel/speed-insights/next";
 
 export const metadata: Metadata = {
   title: {
@@ -92,6 +93,7 @@ export default function RootLayout({
           <main className="pt-16">{children}</main>
         </ThemeProvider>
         <Analytics />
+        <SpeedInsights />
       </body>
     </html>
   );
