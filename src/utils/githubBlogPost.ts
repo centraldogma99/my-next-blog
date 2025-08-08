@@ -5,7 +5,7 @@ import { fetchBlogPostsGithubAPI } from "@/utils/fetchGithubAPI";
 import { parseContent, type Frontmatter } from "@/utils/parseFrontmatter";
 
 export interface BlogPost {
-  fileName: string;
+  slug: string;
   frontmatter: Frontmatter;
   content?: string;
 }
@@ -83,8 +83,11 @@ export async function fetchSingleBlogPost(
   const decodedContent = decodeBase64Content(data.content);
   const { frontmatter, content } = parseContent(decodedContent);
 
+  // .md 또는 .mdx 확장자 제거
+  const fileNameWithoutExtension = data.name.replace(/\.(md|mdx)$/, "");
+
   return {
-    fileName: data.name,
+    slug: fileNameWithoutExtension,
     frontmatter,
     ...(includeContent && { content }),
   };
