@@ -20,7 +20,7 @@ export default function PostsList({ posts, tags, initialTag }: TabViewProps) {
     : posts;
 
   return (
-    <div className="grid grid-cols-1 lg:grid-cols-[250px_1fr] gap-6 pt-12 pb-24">
+    <div className="grid grid-cols-1 lg:grid-cols-[250px_1fr] gap-6 pt-12 pb-24 px-6">
       <aside className="lg:sticky lg:top-6 lg:h-fit">
         <TabFilter
           tagAndCounts={tags}

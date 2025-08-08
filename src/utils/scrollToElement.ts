@@ -2,13 +2,12 @@ import { SCROLL_OFFSET } from "@/app/posts/[slug]/(components)/HeadingWithAnchor
 
 export const scrollToElement = (elementId: string, offset = SCROLL_OFFSET) => {
   const element = document.getElementById(elementId);
-  const parentElement = element?.parentElement;
-  if (!element || !parentElement) return;
+  if (!element) return;
 
   const elementPosition = element.getBoundingClientRect().top;
-  const offsetPosition = elementPosition + parentElement.scrollTop - offset;
+  const offsetPosition = elementPosition + window.scrollY - offset;
 
-  parentElement.scrollTo({
+  window.scrollTo({
     top: offsetPosition,
     behavior: "smooth",
   });

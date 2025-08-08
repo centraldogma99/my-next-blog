@@ -10,8 +10,8 @@ interface HeadingWithAnchorProps {
   className?: string;
 }
 
-// 헤더(64px) + main 패딩(48px) + 24px
-export const SCROLL_OFFSET = 112;
+// 고정된 헤더(64px) + 여유 공간(16px)
+export const SCROLL_OFFSET = 80;
 
 /**
  * 부모 요소를 자신의 위치로 스크롤 이동. (element.parentElement로 참조)

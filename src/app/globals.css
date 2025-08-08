@@ -61,20 +61,6 @@ html.light .shiki span {
   }
 }
 
-@layer components {
-  .container {
-    max-width: 1280px;
-    margin: 0 auto;
-    padding: 0 16px;
-  }
-
-  @media (min-width: 768px) {
-    .container {
-      padding: 0 32px;
-    }
-  }
-}
-
 @layer base {
   h1 {
     @apply scroll-m-20 text-4xl font-extrabold tracking-tight text-balance;
