@@ -76,7 +76,12 @@ export default function RootLayout({
 }) {
   return (
     <html lang="ko" className={DEFAULT_THEME}>
-      <head></head>
+      <head>
+        <meta
+          name="google-site-verification"
+          content="tM0bQCuem6ovQoUH1IFXs0ctwphtKyqD_5BN28ahlaY"
+        />
+      </head>
       <body className={`${pretendard.variable}`}>
         <ThemeProvider>
           <header className="bg-[var(--color-bg-secondary)] border-b border-[var(--color-border)] flex items-center justify-between h-16 px-8 fixed top-0 left-0 right-0 z-50">
