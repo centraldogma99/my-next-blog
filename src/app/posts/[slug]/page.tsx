@@ -1,9 +1,11 @@
+/* eslint-disable react/display-name */
 import {
   CodeBlock,
   isSupportedLanguage,
 } from "@/app/posts/[slug]/(components)/CodeBlock";
 import { HashScrollHandler } from "@/app/posts/[slug]/(components)/HashScrollHandler";
 import { HeadingWithAnchor } from "@/app/posts/[slug]/(components)/HeadingWithAnchor";
+import { extractHeadingsWithIds } from "@/utils/generateUniqueSlug";
 import { fetchSingleBlogPost, isPostPublished } from "@/utils/githubBlogPost";
 import { AUTHOR_NAME } from "@/constants/site";
 import type { ReactNode } from "react";
@@ -121,6 +123,30 @@ export default async function Post({
     keywords: frontmatter.tag.join(", "),
   };
 
+  // 모든 heading을 미리 추출하여 고유 ID 생성
+  const headingsWithIds = extractHeadingsWithIds(content);
+
+  // heading 인덱스를 추적하기 위한 클로저 생성
+  let headingIndex = 0;
+  const createHeadingComponent = (
+    level: 1 | 2 | 3 | 4 | 5 | 6,
+    className?: string,
+  ) => {
+    return ({ children }: { children?: ReactNode }) => {
+      const currentIndex = headingIndex++;
+      const headingData = headingsWithIds[currentIndex];
+      return (
+        <HeadingWithAnchor
+          level={level}
+          className={className}
+          id={headingData?.id}
+        >
+          {children}
+        </HeadingWithAnchor>
+      );
+    };
+  };
+
   return (
     <>
       <HashScrollHandler />
@@ -134,6 +160,7 @@ export default async function Post({
         <div className="lg:flex lg:gap-2 relative max-w-full">
           <TableOfContents
             content={content}
+            headings={headingsWithIds}
             className="py-4 w-[280px] hidden lg:block lg:sticky lg:top-20 lg:overflow-y-auto lg:self-start flex-shrink-0"
           />
           <div className="flex-1 py-6 pt-12 pb-24 px-6 min-w-0">
@@ -141,26 +168,10 @@ export default async function Post({
               <h1 className="break-keep">{frontmatter.title}</h1>
               <Markdown
                 components={{
-                  h1: ({ children }) => (
-                    <HeadingWithAnchor level={1} className="mt-30">
-                      {children}
-                    </HeadingWithAnchor>
-                  ),
-                  h2: ({ children }) => (
-                    <HeadingWithAnchor level={2} className="mt-24">
-                      {children}
-                    </HeadingWithAnchor>
-                  ),
-                  h3: ({ children }) => (
-                    <HeadingWithAnchor level={3} className="mt-16">
-                      {children}
-                    </HeadingWithAnchor>
-                  ),
-                  h4: ({ children }) => (
-                    <HeadingWithAnchor level={4} className="mt-12">
-                      {children}
-                    </HeadingWithAnchor>
-                  ),
+                  h1: createHeadingComponent(1, "mt-30"),
+                  h2: createHeadingComponent(2, "mt-24"),
+                  h3: createHeadingComponent(3, "mt-16"),
+                  h4: createHeadingComponent(4, "mt-12"),
                   img: ({ src, alt, ...props }) => (
                     // eslint-disable-next-line @next/next/no-img-element
                     <img
