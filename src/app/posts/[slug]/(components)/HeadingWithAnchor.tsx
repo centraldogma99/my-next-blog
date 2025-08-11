@@ -8,6 +8,7 @@ interface HeadingWithAnchorProps {
   level: 1 | 2 | 3 | 4 | 5 | 6;
   children: ReactNode;
   className?: string;
+  id?: string;
 }
 
 // 고정된 헤더(64px) + 여유 공간(16px)
@@ -20,9 +21,10 @@ export function HeadingWithAnchor({
   level,
   children,
   className,
+  id: providedId,
 }: HeadingWithAnchorProps) {
   const text = String(children);
-  const id = generateSlug(text);
+  const id = providedId || generateSlug(text);
 
   const handleClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
     e.preventDefault();
