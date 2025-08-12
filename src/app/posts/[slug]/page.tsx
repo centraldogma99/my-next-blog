@@ -5,7 +5,7 @@ import {
 } from "@/app/posts/[slug]/(components)/CodeBlock";
 import { HashScrollHandler } from "@/app/posts/[slug]/(components)/HashScrollHandler";
 import { HeadingWithAnchor } from "@/app/posts/[slug]/(components)/HeadingWithAnchor";
-import { extractHeadingsWithIds } from "@/utils/generateUniqueSlug";
+import { extractHeadingsWithIds } from "@/utils/extractHeadingsWithIds";
 import { fetchSingleBlogPost, isPostPublished } from "@/utils/githubBlogPost";
 import { AUTHOR_NAME } from "@/constants/site";
 import type { ReactNode } from "react";
