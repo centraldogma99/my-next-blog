@@ -139,7 +139,7 @@ export default async function Post({
         <HeadingWithAnchor
           level={level}
           className={className}
-          id={headingData?.id}
+          id={headingData?.id || ""}
         >
           {children}
         </HeadingWithAnchor>
@@ -159,7 +159,6 @@ export default async function Post({
       <article className="max-w-full">
         <div className="lg:flex lg:gap-2 relative max-w-full">
           <TableOfContents
-            content={content}
             headings={headingsWithIds}
             className="py-4 w-[280px] hidden lg:block lg:sticky lg:top-20 lg:overflow-y-auto lg:self-start flex-shrink-0"
           />

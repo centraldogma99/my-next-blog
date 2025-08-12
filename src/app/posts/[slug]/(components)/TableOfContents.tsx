@@ -1,13 +1,11 @@
 "use client";
 
 import { SCROLL_OFFSET } from "@/app/posts/[slug]/(components)/HeadingWithAnchor";
-import { generateSlug } from "@/utils/generateSlug";
 import { scrollToElement } from "@/utils/scrollToElement";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 
 interface TableOfContentsProps {
-  content: string;
-  headings?: Array<{ id: string; text: string; level: number }>;
+  headings: Heading[];
   className?: string;
 }
 
@@ -100,32 +98,9 @@ function HamburgerButton({ isOpen, onClick }: HamburgerButtonProps) {
   );
 }
 
-export function TableOfContents({ content, headings: propHeadings, className }: TableOfContentsProps) {
+export function TableOfContents({ headings, className }: TableOfContentsProps) {
   const [activeId, setActiveId] = useState<string>("");
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-
-  const headings = useMemo(() => {
-    // props로 받은 headings가 있으면 사용, 없으면 기존 로직 사용
-    if (propHeadings) {
-      return propHeadings;
-    }
-    
-    const headingRegex = /^(#{1,6})\s+(.+)$/gm;
-    const matches = [...content.matchAll(headingRegex)];
-    const idCounts = new Map<string, number>();
-    
-    return matches.map((match) => {
-      const level = match[1].length;
-      const text = match[2];
-      const baseId = generateSlug(text);
-      
-      const count = idCounts.get(baseId) || 0;
-      idCounts.set(baseId, count + 1);
-      const id = count === 0 ? baseId : `${baseId}-${count}`;
-
-      return { id, text, level };
-    });
-  }, [content, propHeadings]);
 
   useEffect(() => {
     const observer = new IntersectionObserver(
