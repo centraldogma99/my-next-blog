@@ -29,21 +29,17 @@ export default function PostsContainer({
 
   return (
     <>
-      {showDraftToggle && (
-        <div className="px-6 pt-6">
-          <div className="max-w-[250px]">
-            <DraftToggle 
-              showDrafts={showDrafts} 
-              onToggle={() => setShowDrafts(!showDrafts)} 
-            />
-          </div>
-        </div>
-      )}
       <PostsList 
         posts={visiblePosts} 
         tags={tags} 
         initialTag={initialTag}
       />
+      {showDraftToggle && (
+        <DraftToggle 
+          showDrafts={showDrafts} 
+          onToggle={() => setShowDrafts(!showDrafts)} 
+        />
+      )}
     </>
   );
 }
