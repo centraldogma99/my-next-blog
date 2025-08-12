@@ -96,7 +96,9 @@ export default async function Post({
 
   const { content, frontmatter } = post;
 
-  if (!isPostPublished(post)) {
+  // 개발 환경이 아닌 경우에만 draft 체크
+  const isDevelopment = process.env.NODE_ENV === "development";
+  if (!isDevelopment && !isPostPublished(post)) {
     notFound();
   }
 
@@ -164,7 +166,14 @@ export default async function Post({
           />
           <div className="flex-1 py-6 pt-12 pb-24 px-6 min-w-0">
             <div className="max-w-4xl mx-auto">
-              <h1 className="break-keep">{frontmatter.title}</h1>
+              <h1 className="break-keep">
+                {frontmatter.title}
+                {frontmatter.draft && (
+                  <span className="ml-3 px-3 py-1 text-base bg-yellow-500 text-white rounded">
+                    DRAFT
+                  </span>
+                )}
+              </h1>
               <Markdown
                 components={{
                   h1: createHeadingComponent(1, "mt-30"),

@@ -12,7 +12,11 @@ interface TabViewProps {
   initialTag: string | null;
 }
 
-export default function PostsList({ posts, tags, initialTag }: TabViewProps) {
+export default function PostsList({
+  posts,
+  tags,
+  initialTag,
+}: TabViewProps) {
   const [selectedTag, setSelectedTag] = useState<string | null>(initialTag);
 
   const filteredPosts = selectedTag
@@ -42,6 +46,11 @@ export default function PostsList({ posts, tags, initialTag }: TabViewProps) {
               <Link href={`/posts/${post.slug}`} className="block">
                 <h3 className="text-lg font-semibold mb-2 text-[var(--color-text)] hover:text-[var(--color-primary)]">
                   {post.frontmatter.title}
+                  {post.frontmatter.draft && (
+                    <span className="ml-2 px-2 py-1 text-xs bg-yellow-500 text-white rounded">
+                      DRAFT
+                    </span>
+                  )}
                 </h3>
                 <div className="flex flex-wrap gap-4 text-sm text-[var(--color-text-secondary)]">
                   {post.frontmatter.date && (
