@@ -1,4 +1,4 @@
-import PostsList from "@/app/PostsList";
+import PostsContainer from "@/app/PostsContainer";
 import { fetchBlogPosts, getTagCounts } from "@/utils/githubBlogPost";
 
 export default async function Posts({
@@ -12,12 +12,15 @@ export default async function Posts({
   const isDevelopment = process.env.NODE_ENV === "development";
   const includeDrafts = isDevelopment && showDrafts === "true";
   
-  // draft 포함 여부에 따라 포스트 가져오기
-  const posts = await fetchBlogPosts({ includeDrafts });
+  // 개발 환경에서는 모든 포스트를 가져오고, 클라이언트에서 필터링
+  // 프로덕션에서는 draft 제외한 포스트만 가져옴
+  const posts = await fetchBlogPosts({ 
+    includeDrafts: isDevelopment // 개발 환경에서는 모든 포스트 가져오기
+  });
   const tagAndCounts = getTagCounts(posts);
 
   return (
-    <PostsList 
+    <PostsContainer 
       posts={posts} 
       tags={tagAndCounts} 
       initialTag={tag || null}

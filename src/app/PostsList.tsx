@@ -3,7 +3,6 @@
 import Link from "next/link";
 import { useState } from "react";
 import TabFilter from "./TabFilter";
-import DraftToggle from "./DraftToggle";
 import { pretendard } from "@/app/fonts";
 import type { BlogPost } from "@/utils/githubBlogPost";
 
@@ -11,19 +10,14 @@ interface TabViewProps {
   posts: BlogPost[];
   tags: Record<string, number>;
   initialTag: string | null;
-  showDraftToggle?: boolean;
-  initialShowDrafts?: boolean;
 }
 
 export default function PostsList({
   posts,
   tags,
   initialTag,
-  showDraftToggle = false,
-  initialShowDrafts = false,
 }: TabViewProps) {
   const [selectedTag, setSelectedTag] = useState<string | null>(initialTag);
-  const [showDrafts, setShowDrafts] = useState(initialShowDrafts);
 
   const filteredPosts = selectedTag
     ? posts.filter((post) => post.frontmatter.tag.includes(selectedTag))
@@ -38,12 +32,6 @@ export default function PostsList({
           onTagSelect={setSelectedTag}
           totalPosts={posts.length}
         />
-        {showDraftToggle && (
-          <DraftToggle
-            showDrafts={showDrafts}
-            onToggle={() => setShowDrafts((prev) => !prev)}
-          />
-        )}
       </aside>
       <div className={pretendard.className}>
         <h2 className="text-2xl font-bold mb-6 text-[var(--color-text)]">
