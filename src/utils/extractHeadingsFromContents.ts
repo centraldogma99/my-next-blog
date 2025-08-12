@@ -11,7 +11,7 @@ const generateUniqueSlug = (
   return count === 0 ? baseId : `${baseId}-${count}`;
 };
 
-export const extractHeadingsWithIds = (
+export const extractHeadingsFromContents = (
   content: string,
 ): Array<{ id: string; text: string; level: number }> => {
   const headingRegex = /^(#{1,6})\s+(.+)$/gm;
