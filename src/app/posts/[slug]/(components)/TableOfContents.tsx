@@ -101,10 +101,56 @@ function HamburgerButton({ isOpen, onClick }: HamburgerButtonProps) {
 export function TableOfContents({ headings, className }: TableOfContentsProps) {
   const [activeId, setActiveId] = useState<string>("");
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [userClickedId, setUserClickedId] = useState<string | null>(null);
+
+  // 사용자가 클릭하여 이동한 경우 해당 ID를 유지
+  useEffect(() => {
+    if (userClickedId) {
+      setActiveId(userClickedId);
+    }
+  }, [userClickedId]);
+
+  // 사용자가 직접 스크롤하면 클릭 모드 해제
+  useEffect(() => {
+    if (!userClickedId) return;
+
+    let scrollTimeout: ReturnType<typeof setTimeout>;
+    let isScrollingByUser = false;
+
+    const handleScroll = () => {
+      // 스크롤 시작 감지
+      if (!isScrollingByUser) {
+        isScrollingByUser = true;
+        // 클릭으로 인한 스크롤이 완료된 후 첨 스크롤인지 확인 (약 800ms 후)
+        setTimeout(() => {
+          if (isScrollingByUser) {
+            // 사용자가 직접 스크롤하고 있으므로 클릭 모드 해제
+            setUserClickedId(null);
+          }
+        }, 800);
+      }
+
+      // 스크롤 종료 감지
+      clearTimeout(scrollTimeout);
+      scrollTimeout = setTimeout(() => {
+        isScrollingByUser = false;
+      }, 150);
+    };
+
+    window.addEventListener("scroll", handleScroll, { passive: true });
+
+    return () => {
+      window.removeEventListener("scroll", handleScroll);
+      clearTimeout(scrollTimeout);
+    };
+  }, [userClickedId]);
 
   useEffect(() => {
     const observer = new IntersectionObserver(
       (entries) => {
+        // 사용자가 클릭하여 이동한 경우에는 IntersectionObserver 무시
+        if (userClickedId) return;
+
         entries.forEach((entry) => {
           if (entry.isIntersecting) {
             setActiveId(entry.target.id);
@@ -124,19 +170,26 @@ export function TableOfContents({ headings, className }: TableOfContentsProps) {
     return () => {
       elements.forEach((element) => observer.unobserve(element));
     };
-  }, [headings]);
+  }, [headings, userClickedId]);
 
   const handleClick = (e: React.MouseEvent<HTMLAnchorElement>, id: string) => {
     e.preventDefault();
+
+    // 클릭한 항목 설정
+    setUserClickedId(id);
+
+    // 스크롤 시작
     scrollToElement(id);
-    // preventDefault 때문에 이 처리를 추가로 해 줘야 함
+
+    // URL 업데이트
     window.history.pushState(null, "", `#${encodeURIComponent(id)}`);
+
     // 모바일에서 클릭 후 메뉴 닫기
     setIsMenuOpen(false);
   };
 
   const toggleMenu = () => {
-    setIsMenuOpen(!isMenuOpen);
+    setIsMenuOpen((prev) => !prev);
   };
 
   if (headings.length === 0) return null;
