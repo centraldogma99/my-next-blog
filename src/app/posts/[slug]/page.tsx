@@ -5,7 +5,7 @@ import {
 } from "@/app/posts/[slug]/(components)/CodeBlock";
 import { HashScrollHandler } from "@/app/posts/[slug]/(components)/HashScrollHandler";
 import { HeadingWithAnchor } from "@/app/posts/[slug]/(components)/HeadingWithAnchor";
-import { extractHeadingsWithIds } from "@/utils/extractHeadingsWithIds";
+import { extractHeadingsFromContents } from "@/utils/extractHeadingsFromContents";
 import { fetchSingleBlogPost, isPostPublished } from "@/utils/githubBlogPost";
 import { AUTHOR_NAME } from "@/constants/site";
 import type { ReactNode } from "react";
@@ -126,7 +126,7 @@ export default async function Post({
   };
 
   // 모든 heading을 미리 추출하여 고유 ID 생성
-  const headingsWithIds = extractHeadingsWithIds(content);
+  const headingsWithIds = extractHeadingsFromContents(content);
 
   // heading 인덱스를 추적하기 위한 클로저 생성
   let headingIndex = 0;

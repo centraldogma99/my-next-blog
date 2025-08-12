@@ -1,9 +1,9 @@
 import { describe, it, expect } from "vitest";
-import { extractHeadingsWithIds } from "../extractHeadingsWithIds";
+import { extractHeadingsFromContents } from "../extractHeadingsFromContents";
 
-describe("extractHeadingsWithIds", () => {
+describe("extractHeadingsFromContents", () => {
   it("빈 콘텐츠에서 빈 배열을 반환해야 함", () => {
-    const result = extractHeadingsWithIds("");
+    const result = extractHeadingsFromContents("");
     expect(result).toEqual([]);
   });
 
@@ -12,13 +12,13 @@ describe("extractHeadingsWithIds", () => {
       일반 텍스트입니다.
       이것도 일반 텍스트입니다.
     `;
-    const result = extractHeadingsWithIds(content);
+    const result = extractHeadingsFromContents(content);
     expect(result).toEqual([]);
   });
 
   it("단일 헤딩을 올바르게 추출해야 함", () => {
     const content = "# 제목입니다";
-    const result = extractHeadingsWithIds(content);
+    const result = extractHeadingsFromContents(content);
     expect(result).toEqual([
       { id: "제목입니다", text: "제목입니다", level: 1 }
     ]);
@@ -32,7 +32,7 @@ describe("extractHeadingsWithIds", () => {
 ##### 헤딩 5
 ###### 헤딩 6`;
     
-    const result = extractHeadingsWithIds(content);
+    const result = extractHeadingsFromContents(content);
     expect(result).toEqual([
       { id: "헤딩-1", text: "헤딩 1", level: 1 },
       { id: "헤딩-2", text: "헤딩 2", level: 2 },
@@ -50,7 +50,7 @@ describe("extractHeadingsWithIds", () => {
 ## 다른 제목
 ### 같은 제목`;
     
-    const result = extractHeadingsWithIds(content);
+    const result = extractHeadingsFromContents(content);
     expect(result).toEqual([
       { id: "같은-제목", text: "같은 제목", level: 1 },
       { id: "같은-제목-1", text: "같은 제목", level: 2 },
@@ -66,7 +66,7 @@ describe("extractHeadingsWithIds", () => {
 ### 100% 완료
 #### Node.js v20.0.0`;
     
-    const result = extractHeadingsWithIds(content);
+    const result = extractHeadingsFromContents(content);
     expect(result).toEqual([
       { id: "hello-world", text: "Hello, World!", level: 1 },
       { id: "typescript-javascript", text: "TypeScript & JavaScript", level: 2 },
@@ -84,7 +84,7 @@ describe("extractHeadingsWithIds", () => {
 
 ### 세 번째 헤딩`;
     
-    const result = extractHeadingsWithIds(content);
+    const result = extractHeadingsFromContents(content);
     expect(result).toEqual([
       { id: "첫-번째-헤딩", text: "첫 번째 헤딩", level: 1 },
       { id: "두-번째-헤딩", text: "두 번째 헤딩", level: 2 },
@@ -97,7 +97,7 @@ describe("extractHeadingsWithIds", () => {
 ## useState 기본
 ### useEffect 활용하기`;
     
-    const result = extractHeadingsWithIds(content);
+    const result = extractHeadingsFromContents(content);
     expect(result).toEqual([
       { id: "react-hook-사용법", text: "React Hook 사용법", level: 1 },
       { id: "usestate-기본", text: "useState 기본", level: 2 },
@@ -110,7 +110,7 @@ describe("extractHeadingsWithIds", () => {
 ## ⚡ 빠른 설정
 ### ✅ 완료`;
     
-    const result = extractHeadingsWithIds(content);
+    const result = extractHeadingsFromContents(content);
     expect(result).toEqual([
       { id: "시작하기", text: "🚀 시작하기", level: 1 },
       { id: "빠른-설정", text: "⚡ 빠른 설정", level: 2 },
