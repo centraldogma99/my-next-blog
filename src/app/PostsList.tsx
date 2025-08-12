@@ -15,9 +15,9 @@ interface TabViewProps {
   initialShowDrafts?: boolean;
 }
 
-export default function PostsList({ 
-  posts, 
-  tags, 
+export default function PostsList({
+  posts,
+  tags,
   initialTag,
   showDraftToggle = false,
   initialShowDrafts = false,
@@ -39,9 +39,9 @@ export default function PostsList({
           totalPosts={posts.length}
         />
         {showDraftToggle && (
-          <DraftToggle 
-            showDrafts={showDrafts} 
-            onToggle={() => setShowDrafts(!showDrafts)} 
+          <DraftToggle
+            showDrafts={showDrafts}
+            onToggle={() => setShowDrafts((prev) => !prev)}
           />
         )}
       </aside>
