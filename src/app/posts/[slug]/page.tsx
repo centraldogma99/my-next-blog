@@ -80,6 +80,15 @@ export async function generateMetadata({
   }
 }
 
+// SSG 활성화
+// export async function generateStaticParams() {
+//   const posts = await fetchBlogPosts();
+
+//   return posts.map((post) => ({
+//     slug: post.slug,
+//   }));
+// }
+
 export default async function Post({
   params,
 }: {
