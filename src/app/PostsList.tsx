@@ -12,11 +12,7 @@ interface TabViewProps {
   initialTag: string | null;
 }
 
-export default function PostsList({
-  posts,
-  tags,
-  initialTag,
-}: TabViewProps) {
+export default function PostsList({ posts, tags, initialTag }: TabViewProps) {
   const [selectedTag, setSelectedTag] = useState<string | null>(initialTag);
 
   const filteredPosts = selectedTag
