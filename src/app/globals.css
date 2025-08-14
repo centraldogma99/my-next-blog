@@ -21,6 +21,14 @@ html.light .shiki span {
     --color-bg-secondary: #161b22;
     --color-primary: #2f81f7;
     --color-primary-hover: #1f6feb;
+
+    /* 제목 색상 계층 구조 - 다크모드 */
+    --heading-h1: #4a9eff;
+    --heading-h2: #79b8ff;
+    --heading-h3: #a3c9ff;
+    --heading-h4: #c8deff;
+    --heading-border: #30363d;
+    --heading-accent: #58a6ff;
   }
 
   :root.light {
@@ -31,6 +39,14 @@ html.light .shiki span {
     --color-bg-secondary: #f6f8fa;
     --color-primary: #0969da;
     --color-primary-hover: #0860ca;
+
+    /* 제목 색상 계층 구조 - 라이트모드 */
+    --heading-h1: #0550ae;
+    --heading-h2: #0969da;
+    --heading-h3: #1f7ed8;
+    --heading-h4: #54606a;
+    --heading-border: #d8dee4;
+    --heading-accent: #0969da;
   }
 
   * {
@@ -63,17 +79,28 @@ html.light .shiki span {
 
 @layer base {
   h1 {
-    @apply scroll-m-20 text-4xl font-extrabold tracking-tight text-balance;
+    @apply scroll-m-20 text-5xl font-extrabold tracking-tight text-balance;
+    color: var(--heading-h1);
+    line-height: 1.2;
+    position: relative;
+    transition: color 0.2s ease;
   }
+
   h2 {
-    @apply scroll-m-20 pb-2 text-3xl font-semibold tracking-tight first:mt-0;
+    @apply scroll-m-20 pb-3 text-3xl font-bold tracking-tight first:mt-0;
+    color: var(--heading-h2);
   }
+
   h3 {
-    @apply scroll-m-20 text-2xl font-semibold tracking-tight;
+    @apply scroll-m-20 text-2xl font-semibold tracking-wide;
+    color: var(--heading-h3);
   }
+
   h4 {
-    @apply scroll-m-20 text-xl font-semibold tracking-tight;
+    @apply scroll-m-20 text-xl font-medium tracking-tight;
+    color: var(--heading-h4);
   }
+
   p {
     @apply leading-7 [&:not(:first-child)]:mt-6;
   }
@@ -82,5 +109,32 @@ html.light .shiki span {
   }
   ol {
     @apply my-6 ml-6 list-decimal [&>li]:mt-2;
+  }
+  
+  blockquote {
+    @apply mt-6 pl-6 italic border-l-4 py-1;
+    border-color: var(--heading-accent);
+    background: color-mix(in srgb, var(--color-bg-secondary) 50%, transparent);
+    color: var(--color-text-secondary);
+    position: relative;
+    font-style: italic;
+    quotes: """ """ "'" "'";
+  }
+  
+  blockquote::before {
+    content: open-quote;
+    @apply text-4xl absolute -top-2 left-2;
+    color: var(--heading-accent);
+    opacity: 0.3;
+    font-family: Georgia, serif;
+  }
+  
+  blockquote p {
+    @apply mb-0;
+  }
+  
+  blockquote cite {
+    @apply block mt-2 text-sm not-italic;
+    color: var(--color-text-secondary);
   }
 }
