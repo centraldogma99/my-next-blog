@@ -3,13 +3,11 @@
 import { useState, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import dynamic from "next/dynamic";
-import "@uiw/react-md-editor/markdown-editor.css";
-import "@uiw/react-markdown-preview/markdown.css";
 import { Loader2 } from "lucide-react";
 
 const MDEditor = dynamic(
   () => import("@uiw/react-md-editor").then((mod) => mod.default),
-  { ssr: false }
+  { ssr: false },
 );
 
 interface PostForm {
@@ -31,63 +29,93 @@ export default function NewPostPage() {
     draft: true,
   });
 
-  const handleSubmit = useCallback(async (e: React.FormEvent) => {
-    e.preventDefault();
-    setLoading(true);
+  const handleSubmit = useCallback(
+    async (e: React.FormEvent) => {
+      e.preventDefault();
+      setLoading(true);
 
-    try {
-      // 날짜 생성
-      const date = new Date().toISOString().split("T")[0];
-      
-      // frontmatter 생성
-      const frontmatter = [
-        "---",
-        `title: "${form.title}"`,
-        `date: "${date}"`,
-        `tag: [${form.tags.split(",").map(t => `"${t.trim()}"`).join(", ")}]`,
-        form.description && `description: "${form.description}"`,
-        form.draft && `draft: true`,
-        "---",
-      ].filter(Boolean).join("\n");
+      try {
+        // 날짜 생성
+        const date = new Date().toISOString().split("T")[0];
 
-      const fullContent = `${frontmatter}\n\n${form.content}`;
+        // 태그 처리
+        const tags = form.tags
+          .split(",")
+          .map((t) => t.trim())
+          .filter(Boolean);
+        
+        // frontmatter 생성
+        const frontmatterParts = [
+          "---",
+          `title: "${form.title}"`,
+          `date: "${date}"`,
+        ];
+        
+        // 태그를 YAML 리스트 형식으로 추가
+        if (tags.length > 0) {
+          frontmatterParts.push("tag:");
+          tags.forEach(tag => {
+            frontmatterParts.push(`  - ${tag}`);
+          });
+        }
+        
+        if (form.description) {
+          frontmatterParts.push(`description: "${form.description}"`);
+        }
+        
+        if (form.draft) {
+          frontmatterParts.push(`draft: true`);
+        }
+        
+        frontmatterParts.push("---");
+        
+        const frontmatter = frontmatterParts.join("\n");
 
-      // 파일명 생성 (제목을 slug로 변환)
-      const slug = form.title
-        .toLowerCase()
-        .replace(/[^a-z0-9가-힣]/g, "-")
-        .replace(/-+/g, "-")
-        .replace(/^-|-$/g, "");
+        console.log(frontmatter);
+        const fullContent = `${frontmatter}\n\n${form.content}`;
 
-      const response = await fetch("/api/posts", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          slug,
-          content: fullContent,
-        }),
-      });
+        // 파일명 생성 (제목을 slug로 변환)
+        const slug = form.title
+          .toLowerCase()
+          .replace(/[^a-z0-9가-힣]/g, "-")
+          .replace(/-+/g, "-")
+          .replace(/^-|-$/g, "");
 
-      if (!response.ok) {
-        const error = await response.json();
-        throw new Error(error.message || "포스트 생성 실패");
+        const response = await fetch("/api/posts", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            slug,
+            content: fullContent,
+          }),
+        });
+
+        if (!response.ok) {
+          const error = await response.json();
+          throw new Error(error.message || "포스트 생성 실패");
+        }
+
+        router.push(`/posts/${slug}`);
+      } catch (error) {
+        console.error("Error creating post:", error);
+        alert(
+          error instanceof Error
+            ? error.message
+            : "포스트 생성 중 오류가 발생했습니다.",
+        );
+      } finally {
+        setLoading(false);
       }
-
-      router.push(`/posts/${slug}`);
-    } catch (error) {
-      console.error("Error creating post:", error);
-      alert(error instanceof Error ? error.message : "포스트 생성 중 오류가 발생했습니다.");
-    } finally {
-      setLoading(false);
-    }
-  }, [form, router]);
+    },
+    [form, router],
+  );
 
   return (
     <div className="max-w-6xl mx-auto px-4 py-8">
       <h1 className="text-3xl font-bold mb-8">새 포스트 작성</h1>
-      
+
       <form onSubmit={handleSubmit} className="space-y-6">
         <div>
           <label htmlFor="title" className="block text-sm font-medium mb-2">
@@ -105,7 +133,10 @@ export default function NewPostPage() {
         </div>
 
         <div>
-          <label htmlFor="description" className="block text-sm font-medium mb-2">
+          <label
+            htmlFor="description"
+            className="block text-sm font-medium mb-2"
+          >
             설명
           </label>
           <input
@@ -146,9 +177,7 @@ export default function NewPostPage() {
         </div>
 
         <div>
-          <label className="block text-sm font-medium mb-2">
-            내용 *
-          </label>
+          <label className="block text-sm font-medium mb-2">내용 *</label>
           <div data-color-mode="light" className="min-h-[500px]">
             <MDEditor
               value={form.content}

@@ -3,13 +3,11 @@
 import { useState, useCallback, useEffect } from "react";
 import { useRouter, useParams } from "next/navigation";
 import dynamic from "next/dynamic";
-import "@uiw/react-md-editor/markdown-editor.css";
-import "@uiw/react-markdown-preview/markdown.css";
 import { Loader2 } from "lucide-react";
 
 const MDEditor = dynamic(
   () => import("@uiw/react-md-editor").then((mod) => mod.default),
-  { ssr: false }
+  { ssr: false },
 );
 
 interface PostForm {
@@ -25,7 +23,7 @@ export default function EditPostPage() {
   const router = useRouter();
   const params = useParams();
   const slug = params.slug as string;
-  
+
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [form, setForm] = useState<PostForm>({
@@ -45,10 +43,10 @@ export default function EditPostPage() {
         if (!response.ok) {
           throw new Error("포스트를 불러올 수 없습니다.");
         }
-        
+
         const data = await response.json();
         const { frontmatter, content } = data;
-        
+
         setForm({
           title: frontmatter.title || "",
           description: frontmatter.description || "",
@@ -69,47 +67,76 @@ export default function EditPostPage() {
     loadPost();
   }, [slug, router]);
 
-  const handleSubmit = useCallback(async (e: React.FormEvent) => {
-    e.preventDefault();
-    setSaving(true);
+  const handleSubmit = useCallback(
+    async (e: React.FormEvent) => {
+      e.preventDefault();
+      setSaving(true);
 
-    try {
-      // frontmatter 생성
-      const frontmatter = [
-        "---",
-        `title: "${form.title}"`,
-        `date: "${form.date}"`,
-        `tag: [${form.tags.split(",").map(t => `"${t.trim()}"`).join(", ")}]`,
-        form.description && `description: "${form.description}"`,
-        form.draft && `draft: true`,
-        "---",
-      ].filter(Boolean).join("\n");
+      try {
+        // 태그 처리
+        const tags = form.tags
+          .split(",")
+          .map((t) => t.trim())
+          .filter(Boolean);
+        
+        // frontmatter 생성
+        const frontmatterParts = [
+          "---",
+          `title: "${form.title}"`,
+          `date: "${form.date}"`,
+        ];
+        
+        // 태그를 YAML 리스트 형식으로 추가
+        if (tags.length > 0) {
+          frontmatterParts.push("tag:");
+          tags.forEach(tag => {
+            frontmatterParts.push(`  - ${tag}`);
+          });
+        }
+        
+        if (form.description) {
+          frontmatterParts.push(`description: "${form.description}"`);
+        }
+        
+        if (form.draft) {
+          frontmatterParts.push(`draft: true`);
+        }
+        
+        frontmatterParts.push("---");
+        
+        const frontmatter = frontmatterParts.join("\n");
 
-      const fullContent = `${frontmatter}\n\n${form.content}`;
+        const fullContent = `${frontmatter}\n\n${form.content}`;
 
-      const response = await fetch(`/api/posts/${slug}`, {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          content: fullContent,
-        }),
-      });
+        const response = await fetch(`/api/posts/${slug}`, {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            content: fullContent,
+          }),
+        });
 
-      if (!response.ok) {
-        const error = await response.json();
-        throw new Error(error.message || "포스트 수정 실패");
+        if (!response.ok) {
+          const error = await response.json();
+          throw new Error(error.message || "포스트 수정 실패");
+        }
+
+        router.push(`/posts/${slug}`);
+      } catch (error) {
+        console.error("Error updating post:", error);
+        alert(
+          error instanceof Error
+            ? error.message
+            : "포스트 수정 중 오류가 발생했습니다.",
+        );
+      } finally {
+        setSaving(false);
       }
-
-      router.push(`/posts/${slug}`);
-    } catch (error) {
-      console.error("Error updating post:", error);
-      alert(error instanceof Error ? error.message : "포스트 수정 중 오류가 발생했습니다.");
-    } finally {
-      setSaving(false);
-    }
-  }, [form, slug, router]);
+    },
+    [form, slug, router],
+  );
 
   if (loading) {
     return (
@@ -122,7 +149,7 @@ export default function EditPostPage() {
   return (
     <div className="max-w-6xl mx-auto px-4 py-8">
       <h1 className="text-3xl font-bold mb-8">포스트 수정</h1>
-      
+
       <form onSubmit={handleSubmit} className="space-y-6">
         <div>
           <label htmlFor="title" className="block text-sm font-medium mb-2">
@@ -153,7 +180,10 @@ export default function EditPostPage() {
         </div>
 
         <div>
-          <label htmlFor="description" className="block text-sm font-medium mb-2">
+          <label
+            htmlFor="description"
+            className="block text-sm font-medium mb-2"
+          >
             설명
           </label>
           <input
@@ -194,9 +224,7 @@ export default function EditPostPage() {
         </div>
 
         <div>
-          <label className="block text-sm font-medium mb-2">
-            내용 *
-          </label>
+          <label className="block text-sm font-medium mb-2">내용 *</label>
           <div data-color-mode="light" className="min-h-[500px]">
             <MDEditor
               value={form.content}
