@@ -13,7 +13,7 @@ export async function POST(request: NextRequest) {
     if (!session || !session.accessToken) {
       return NextResponse.json(
         { message: "인증되지 않은 요청입니다." },
-        { status: 401 }
+        { status: 401 },
       );
     }
 
@@ -22,7 +22,7 @@ export async function POST(request: NextRequest) {
     if (!slug || !content) {
       return NextResponse.json(
         { message: "slug와 content는 필수입니다." },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -55,12 +55,12 @@ export async function POST(request: NextRequest) {
         message: "포스트가 성공적으로 생성되었습니다.",
         data: response.data,
       });
-    } catch (error: any) {
+    } catch (error) {
       // 이미 파일이 존재하는 경우
-      if (error.status === 422) {
+      if (error instanceof Error && "status" in error && error.status === 422) {
         return NextResponse.json(
           { message: "이미 존재하는 파일명입니다." },
-          { status: 409 }
+          { status: 409 },
         );
       }
       throw error;
@@ -69,7 +69,7 @@ export async function POST(request: NextRequest) {
     console.error("Error creating post:", error);
     return NextResponse.json(
       { message: "포스트 생성 중 오류가 발생했습니다." },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
