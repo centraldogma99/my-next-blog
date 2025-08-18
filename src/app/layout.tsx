@@ -16,6 +16,7 @@ import {
 import { SpeedInsights } from "@vercel/speed-insights/next";
 import AuthProvider from "@/components/AuthProvider";
 import AuthButton from "@/components/AuthButton";
+import NewPostButton from "@/components/NewPostButton";
 
 export const metadata: Metadata = {
   title: {
@@ -92,6 +93,7 @@ export default function RootLayout({
                 </Link>
               </h1>
               <div className="flex items-center gap-2">
+                <NewPostButton />
                 <AuthButton />
                 <ThemeToggle />
               </div>

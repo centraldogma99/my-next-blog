@@ -195,7 +195,7 @@ export default async function Post({
                     </span>
                   )}
                 </h1>
-                <AdminButtons type="edit" slug={slug} />
+                <AdminButtons slug={slug} isDraft={frontmatter.draft} />
               </div>
               <Markdown
                 components={{
