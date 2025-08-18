@@ -6,7 +6,11 @@ import {
 import { HashScrollHandler } from "@/app/posts/[slug]/(components)/HashScrollHandler";
 import { HeadingWithAnchor } from "@/app/posts/[slug]/(components)/HeadingWithAnchor";
 import { extractHeadingsFromContents } from "@/utils/extractHeadingsFromContents";
-import { fetchSingleBlogPost, isPostPublished } from "@/utils/githubBlogPost";
+import {
+  fetchBlogPosts,
+  fetchSingleBlogPost,
+  isPostPublished,
+} from "@/utils/githubBlogPost";
 import { AUTHOR_NAME } from "@/constants/site";
 import type { ReactNode } from "react";
 import React from "react";
@@ -80,14 +84,15 @@ export async function generateMetadata({
   }
 }
 
-// SSG 활성화
-// export async function generateStaticParams() {
-//   const posts = await fetchBlogPosts();
+export const revalidate = 120; // 120초(2분)마다 ISR 리밸리데이션
 
-//   return posts.map((post) => ({
-//     slug: post.slug,
-//   }));
-// }
+export async function generateStaticParams() {
+  const posts = await fetchBlogPosts();
+
+  return posts.map((post) => ({
+    slug: post.slug,
+  }));
+}
 
 export default async function Post({
   params,
