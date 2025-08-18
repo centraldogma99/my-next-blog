@@ -104,11 +104,24 @@ html.light .shiki span {
   p {
     @apply leading-7 [&:not(:first-child)]:mt-6;
   }
-  ul {
+  /* 최상위 리스트에만 스타일 적용 */
+  ul:not(li > ul) {
     @apply my-6 ml-6 list-disc [&>li]:mt-2;
   }
-  ol {
+  
+  /* 중첩된 ul은 기본 스타일만 적용 */
+  li > ul {
+    @apply ml-6 list-disc mt-2;
+  }
+  
+  /* 최상위 ol에만 스타일 적용 */
+  ol:not(li > ol) {
     @apply my-6 ml-6 list-decimal [&>li]:mt-2;
+  }
+  
+  /* 중첩된 ol은 기본 스타일만 적용 */
+  li > ol {
+    @apply ml-6 list-decimal mt-2;
   }
   
   blockquote {
