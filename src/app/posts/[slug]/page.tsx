@@ -18,6 +18,7 @@ import Markdown from "react-markdown";
 import type { Metadata } from "next";
 import { TableOfContents } from "@/app/posts/[slug]/(components)/TableOfContents";
 import { notFound } from "next/navigation";
+import AdminButtons from "@/components/AdminButtons";
 import Script from "next/script";
 
 const getChildrenCodeTag = (node: ReactNode) => {
@@ -185,14 +186,17 @@ export default async function Post({
           />
           <div className="flex-1 py-6 pt-12 pb-24 px-6 min-w-0">
             <div className="max-w-4xl mx-auto">
-              <h1 className="break-keep">
-                {frontmatter.title}
-                {frontmatter.draft && (
-                  <span className="ml-3 px-3 py-1 text-base bg-yellow-500 text-white rounded">
-                    DRAFT
-                  </span>
-                )}
-              </h1>
+              <div className="flex items-start justify-between gap-4 mb-6">
+                <h1 className="break-keep flex-1">
+                  {frontmatter.title}
+                  {frontmatter.draft && (
+                    <span className="ml-3 px-3 py-1 text-base bg-yellow-500 text-white rounded">
+                      DRAFT
+                    </span>
+                  )}
+                </h1>
+                <AdminButtons type="edit" slug={slug} />
+              </div>
               <Markdown
                 components={{
                   h1: createHeadingComponent(1, "mt-30"),

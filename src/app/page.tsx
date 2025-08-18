@@ -1,5 +1,6 @@
 import PostsContainer from "@/app/PostsContainer";
 import { fetchBlogPosts, getTagCounts } from "@/utils/githubBlogPost";
+import AdminButtons from "@/components/AdminButtons";
 
 export const revalidate = 120; // 120초(2분)마다 ISR 리밸리데이션
 
@@ -22,12 +23,15 @@ export default async function Posts({
   const tagAndCounts = getTagCounts(posts);
 
   return (
-    <PostsContainer 
-      posts={posts} 
-      tags={tagAndCounts} 
-      initialTag={tag || null}
-      showDraftToggle={isDevelopment}
-      initialShowDrafts={includeDrafts}
-    />
+    <>
+      <PostsContainer 
+        posts={posts} 
+        tags={tagAndCounts} 
+        initialTag={tag || null}
+        showDraftToggle={isDevelopment}
+        initialShowDrafts={includeDrafts}
+      />
+      <AdminButtons type="new" />
+    </>
   );
 }

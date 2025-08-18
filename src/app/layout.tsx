@@ -14,6 +14,8 @@ import {
   SITE_KEYWORDS,
 } from "@/constants/site";
 import { SpeedInsights } from "@vercel/speed-insights/next";
+import AuthProvider from "@/components/AuthProvider";
+import AuthButton from "@/components/AuthButton";
 
 export const metadata: Metadata = {
   title: {
@@ -78,20 +80,25 @@ export default function RootLayout({
     <html lang="ko" className={DEFAULT_THEME}>
       <head></head>
       <body className={`${pretendard.variable}`}>
-        <ThemeProvider>
-          <header className="bg-[var(--color-bg-secondary)] border-b border-[var(--color-border)] flex items-center justify-between h-16 px-8 fixed top-0 left-0 right-0 z-50">
-            <h1 className="text-xl font-semibold">
-              <Link
-                href="/"
-                className="text-[var(--color-text)] hover:text-[var(--color-text)] no-underline hover:underline-0 cursor-pointer"
-              >
-                {SITE_NAME}
-              </Link>
-            </h1>
-            <ThemeToggle />
-          </header>
-          <main className="pt-16">{children}</main>
-        </ThemeProvider>
+        <AuthProvider>
+          <ThemeProvider>
+            <header className="bg-[var(--color-bg-secondary)] border-b border-[var(--color-border)] flex items-center justify-between h-16 px-8 fixed top-0 left-0 right-0 z-50">
+              <h1 className="text-xl font-semibold">
+                <Link
+                  href="/"
+                  className="text-[var(--color-text)] hover:text-[var(--color-text)] no-underline hover:underline-0 cursor-pointer"
+                >
+                  {SITE_NAME}
+                </Link>
+              </h1>
+              <div className="flex items-center gap-2">
+                <AuthButton />
+                <ThemeToggle />
+              </div>
+            </header>
+            <main className="pt-16">{children}</main>
+          </ThemeProvider>
+        </AuthProvider>
         <Analytics />
         <SpeedInsights />
       </body>
