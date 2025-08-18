@@ -89,16 +89,14 @@ export const revalidate = 120; // 120초(2분)마다 ISR 리밸리데이션
 export async function generateStaticParams() {
   // 프로덕션 빌드 시에는 draft 포스트 제외
   const isDevelopment = process.env.NODE_ENV === "development";
-  const posts = await fetchBlogPosts({ 
-    includeDrafts: isDevelopment 
+  const posts = await fetchBlogPosts({
+    includeDrafts: isDevelopment,
   });
 
   // draft가 아닌 포스트만 빌드
-  return posts
-    .filter(post => isDevelopment || !post.frontmatter.draft)
-    .map((post) => ({
-      slug: post.slug,
-    }));
+  return posts.map((post) => ({
+    slug: post.slug,
+  }));
 }
 
 export default async function Post({
