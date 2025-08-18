@@ -3,9 +3,11 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 import { Octokit } from "octokit";
 import { fetchSingleBlogPost } from "@/utils/githubBlogPost";
+import { getToken } from "next-auth/jwt";
 
-const REPO_OWNER = "centraldogma99";
-const REPO_NAME = "dogma-blog-posts";
+// 환경 변수에서 GitHub 리포지토리 정보 가져오기
+const REPO_OWNER = process.env.GITHUB_REPO_OWNER;
+const REPO_NAME = process.env.GITHUB_REPO_NAME;
 
 // GET: 포스트 조회 (편집용)
 export async function GET(
@@ -34,9 +36,21 @@ export async function PUT(
     const { slug } = await params;
     // 세션 확인
     const session = await getServerSession(authOptions);
-    if (!session || !session.accessToken) {
+    if (!session) {
       return NextResponse.json(
         { message: "인증되지 않은 요청입니다." },
+        { status: 401 },
+      );
+    }
+
+    const token = await getToken({
+      req: request,
+      secret: process.env.NEXTAUTH_SECRET,
+    });
+
+    if (!token?.accessToken) {
+      return NextResponse.json(
+        { message: "인증 토큰이 없습니다." },
         { status: 401 },
       );
     }
@@ -52,11 +66,19 @@ export async function PUT(
 
     // Octokit 인스턴스 생성
     const octokit = new Octokit({
-      auth: session.accessToken,
+      auth: token.accessToken as string,
     });
 
     // 파일 경로
     const path = `posts/${slug}.md`;
+
+    // 환경 변수 검증
+    if (!REPO_OWNER || !REPO_NAME) {
+      return NextResponse.json(
+        { message: "GitHub 리포지토리 설정이 필요합니다." },
+        { status: 500 },
+      );
+    }
 
     // 현재 파일의 SHA 가져오기
     const { data: fileData } = await octokit.rest.repos.getContent({
@@ -111,20 +133,41 @@ export async function DELETE(
   try {
     // 세션 확인
     const session = await getServerSession(authOptions);
-    if (!session || !session.accessToken) {
+    if (!session) {
       return NextResponse.json(
         { message: "인증되지 않은 요청입니다." },
         { status: 401 },
       );
     }
 
+    // JWT 토큰에서 액세스 토큰 가져오기 (서버 측에서만)
+    const token = await getToken({ 
+      req: request, 
+      secret: process.env.NEXTAUTH_SECRET 
+    });
+    
+    if (!token?.accessToken) {
+      return NextResponse.json(
+        { message: "인증 토큰이 없습니다." },
+        { status: 401 },
+      );
+    }
+
     // Octokit 인스턴스 생성
     const octokit = new Octokit({
-      auth: session.accessToken,
+      auth: token.accessToken as string,
     });
 
     // 파일 경로
     const path = `posts/${slug}.md`;
+
+    // 환경 변수 검증
+    if (!REPO_OWNER || !REPO_NAME) {
+      return NextResponse.json(
+        { message: "GitHub 리포지토리 설정이 필요합니다." },
+        { status: 500 },
+      );
+    }
 
     // 현재 파일의 SHA 가져오기
     const { data: fileData } = await octokit.rest.repos.getContent({
