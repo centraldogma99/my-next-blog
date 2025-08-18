@@ -4,6 +4,7 @@ import { useState, useCallback, useEffect } from "react";
 import { useRouter, useParams } from "next/navigation";
 import dynamic from "next/dynamic";
 import { Loader2 } from "lucide-react";
+import { generateFrontmatter } from "@/utils/frontmatter";
 
 const MDEditor = dynamic(
   () => import("@uiw/react-md-editor").then((mod) => mod.default),
@@ -73,38 +74,18 @@ export default function EditPostPage() {
       setSaving(true);
 
       try {
-        // 태그 처리
-        const tags = form.tags
-          .split(",")
-          .map((t) => t.trim())
-          .filter(Boolean);
-
+        // FormData 생성
+        const formData = new FormData();
+        formData.append('title', form.title);
+        formData.append('tags', form.tags);
+        formData.append('description', form.subtitle || '');
+        formData.append('date', form.date);
+        formData.append('slug', slug);
+        formData.append('draft', String(form.draft));
+        
         // frontmatter 생성
-        const frontmatterParts = [
-          "---",
-          `title: "${form.title}"`,
-          `date: "${form.date}"`,
-        ];
-
-        // 태그를 YAML 리스트 형식으로 추가
-        if (tags.length > 0) {
-          frontmatterParts.push("tag:");
-          tags.forEach((tag) => {
-            frontmatterParts.push(`  - ${tag}`);
-          });
-        }
-
-        if (form.subtitle) {
-          frontmatterParts.push(`subtitle: "${form.subtitle}"`);
-        }
-
-        frontmatterParts.push(`draft: ${form.draft}`);
-
-        frontmatterParts.push("---");
-
-        const frontmatter = frontmatterParts.join("\n");
-
-        const fullContent = `${frontmatter}\n\n${form.content}`;
+        const frontmatter = generateFrontmatter(formData);
+        const fullContent = `${frontmatter}${form.content}`;
 
         const response = await fetch(`/api/posts/${slug}`, {
           method: "PUT",

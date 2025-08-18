@@ -1,12 +1,13 @@
 import Link from "next/link";
 import { AlertCircle } from "lucide-react";
 
-export default function AuthError({
+export default async function AuthError({
   searchParams,
 }: {
-  searchParams: { error?: string };
+  searchParams: Promise<{ error?: string }>;
 }) {
-  const error = searchParams.error;
+  const params = await searchParams;
+  const error = params.error;
   
   const errorMessages: Record<string, string> = {
     Configuration: "서버 설정에 문제가 있습니다. 관리자에게 문의하세요.",
