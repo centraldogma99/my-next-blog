@@ -12,7 +12,7 @@ const MDEditor = dynamic(
 
 interface PostForm {
   title: string;
-  description: string;
+  subtitle: string;
   tags: string;
   content: string;
   draft: boolean;
@@ -28,7 +28,7 @@ export default function EditPostPage() {
   const [saving, setSaving] = useState(false);
   const [form, setForm] = useState<PostForm>({
     title: "",
-    description: "",
+    subtitle: "",
     tags: "",
     content: "",
     draft: false,
@@ -49,7 +49,7 @@ export default function EditPostPage() {
 
         setForm({
           title: frontmatter.title || "",
-          description: frontmatter.description || "",
+          subtitle: frontmatter.subtitle || "",
           tags: frontmatter.tag?.join(", ") || "",
           content: content || "",
           draft: frontmatter.draft || false,
@@ -78,32 +78,30 @@ export default function EditPostPage() {
           .split(",")
           .map((t) => t.trim())
           .filter(Boolean);
-        
+
         // frontmatter 생성
         const frontmatterParts = [
           "---",
           `title: "${form.title}"`,
           `date: "${form.date}"`,
         ];
-        
+
         // 태그를 YAML 리스트 형식으로 추가
         if (tags.length > 0) {
           frontmatterParts.push("tag:");
-          tags.forEach(tag => {
+          tags.forEach((tag) => {
             frontmatterParts.push(`  - ${tag}`);
           });
         }
-        
-        if (form.description) {
-          frontmatterParts.push(`description: "${form.description}"`);
+
+        if (form.subtitle) {
+          frontmatterParts.push(`subtitle: "${form.subtitle}"`);
         }
-        
-        if (form.draft) {
-          frontmatterParts.push(`draft: true`);
-        }
-        
+
+        frontmatterParts.push(`draft: ${form.draft}`);
+
         frontmatterParts.push("---");
-        
+
         const frontmatter = frontmatterParts.join("\n");
 
         const fullContent = `${frontmatter}\n\n${form.content}`;
@@ -181,18 +179,18 @@ export default function EditPostPage() {
 
         <div>
           <label
-            htmlFor="description"
+            htmlFor="subtitle"
             className="block text-sm font-medium mb-2"
           >
-            설명
+            부제목
           </label>
           <input
-            id="description"
+            id="subtitle"
             type="text"
-            value={form.description}
-            onChange={(e) => setForm({ ...form, description: e.target.value })}
+            value={form.subtitle}
+            onChange={(e) => setForm({ ...form, subtitle: e.target.value })}
             className="w-full px-4 py-2 rounded-lg border border-[var(--color-border)] bg-[var(--color-bg-secondary)] focus:outline-none focus:ring-2 focus:ring-blue-500"
-            placeholder="포스트 설명 (SEO용)"
+            placeholder="포스트 부제목"
           />
         </div>
 

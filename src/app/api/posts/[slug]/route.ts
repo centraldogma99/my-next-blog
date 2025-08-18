@@ -10,16 +10,17 @@ const REPO_NAME = "dogma-blog-posts";
 // GET: 포스트 조회 (편집용)
 export async function GET(
   request: NextRequest,
-  { params }: { params: { slug: string } }
+  { params }: { params: Promise<{ slug: string }> },
 ) {
   try {
-    const post = await fetchSingleBlogPost(`${params.slug}.md`, true);
+    const { slug } = await params;
+    const post = await fetchSingleBlogPost(`${slug}.md`, true);
     return NextResponse.json(post);
   } catch (error) {
     console.error("Error fetching post:", error);
     return NextResponse.json(
       { message: "포스트를 찾을 수 없습니다." },
-      { status: 404 }
+      { status: 404 },
     );
   }
 }
@@ -27,15 +28,16 @@ export async function GET(
 // PUT: 포스트 수정
 export async function PUT(
   request: NextRequest,
-  { params }: { params: { slug: string } }
+  { params }: { params: Promise<{ slug: string }> },
 ) {
   try {
+    const { slug } = await params;
     // 세션 확인
     const session = await getServerSession(authOptions);
     if (!session || !session.accessToken) {
       return NextResponse.json(
         { message: "인증되지 않은 요청입니다." },
-        { status: 401 }
+        { status: 401 },
       );
     }
 
@@ -44,7 +46,7 @@ export async function PUT(
     if (!content) {
       return NextResponse.json(
         { message: "content는 필수입니다." },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -54,7 +56,7 @@ export async function PUT(
     });
 
     // 파일 경로
-    const path = `posts/${params.slug}.md`;
+    const path = `posts/${slug}.md`;
 
     // 현재 파일의 SHA 가져오기
     const { data: fileData } = await octokit.rest.repos.getContent({
@@ -66,7 +68,7 @@ export async function PUT(
     if (!("sha" in fileData)) {
       return NextResponse.json(
         { message: "파일 정보를 가져올 수 없습니다." },
-        { status: 500 }
+        { status: 500 },
       );
     }
 
@@ -78,7 +80,7 @@ export async function PUT(
       owner: REPO_OWNER,
       repo: REPO_NAME,
       path,
-      message: `Update post: ${params.slug}`,
+      message: `Update post: ${slug}`,
       content: contentBase64,
       sha: fileData.sha,
       committer: {
@@ -95,7 +97,7 @@ export async function PUT(
     console.error("Error updating post:", error);
     return NextResponse.json(
       { message: "포스트 수정 중 오류가 발생했습니다." },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
@@ -103,15 +105,16 @@ export async function PUT(
 // DELETE: 포스트 삭제
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { slug: string } }
+  { params }: { params: Promise<{ slug: string }> },
 ) {
+  const { slug } = await params;
   try {
     // 세션 확인
     const session = await getServerSession(authOptions);
     if (!session || !session.accessToken) {
       return NextResponse.json(
         { message: "인증되지 않은 요청입니다." },
-        { status: 401 }
+        { status: 401 },
       );
     }
 
@@ -121,7 +124,7 @@ export async function DELETE(
     });
 
     // 파일 경로
-    const path = `posts/${params.slug}.md`;
+    const path = `posts/${slug}.md`;
 
     // 현재 파일의 SHA 가져오기
     const { data: fileData } = await octokit.rest.repos.getContent({
@@ -133,7 +136,7 @@ export async function DELETE(
     if (!("sha" in fileData)) {
       return NextResponse.json(
         { message: "파일 정보를 가져올 수 없습니다." },
-        { status: 500 }
+        { status: 500 },
       );
     }
 
@@ -142,7 +145,7 @@ export async function DELETE(
       owner: REPO_OWNER,
       repo: REPO_NAME,
       path,
-      message: `Delete post: ${params.slug}`,
+      message: `Delete post: ${slug}`,
       sha: fileData.sha,
       committer: {
         name: session.user?.name || "Anonymous",
@@ -158,7 +161,7 @@ export async function DELETE(
     console.error("Error deleting post:", error);
     return NextResponse.json(
       { message: "포스트 삭제 중 오류가 발생했습니다." },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

@@ -12,7 +12,7 @@ const MDEditor = dynamic(
 
 interface PostForm {
   title: string;
-  description: string;
+  subtitle: string;
   tags: string;
   content: string;
   draft: boolean;
@@ -23,7 +23,7 @@ export default function NewPostPage() {
   const [loading, setLoading] = useState(false);
   const [form, setForm] = useState<PostForm>({
     title: "",
-    description: "",
+    subtitle: "",
     tags: "",
     content: "",
     draft: true,
@@ -59,8 +59,8 @@ export default function NewPostPage() {
           });
         }
         
-        if (form.description) {
-          frontmatterParts.push(`description: "${form.description}"`);
+        if (form.subtitle) {
+          frontmatterParts.push(`subtitle: "${form.subtitle}"`);
         }
         
         if (form.draft) {
@@ -134,18 +134,18 @@ export default function NewPostPage() {
 
         <div>
           <label
-            htmlFor="description"
+            htmlFor="subtitle"
             className="block text-sm font-medium mb-2"
           >
-            설명
+            부제목
           </label>
           <input
-            id="description"
+            id="subtitle"
             type="text"
-            value={form.description}
-            onChange={(e) => setForm({ ...form, description: e.target.value })}
+            value={form.subtitle}
+            onChange={(e) => setForm({ ...form, subtitle: e.target.value })}
             className="w-full px-4 py-2 rounded-lg border border-[var(--color-border)] bg-[var(--color-bg-secondary)] focus:outline-none focus:ring-2 focus:ring-blue-500"
-            placeholder="포스트 설명 (SEO용)"
+            placeholder="포스트 부제목"
           />
         </div>
 
