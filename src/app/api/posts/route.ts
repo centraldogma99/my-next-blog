@@ -2,20 +2,40 @@ import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 import { Octokit } from "octokit";
+import { getToken } from "next-auth/jwt";
 
-const REPO_OWNER = "centraldogma99";
-const REPO_NAME = "dogma-blog-posts";
+// 환경 변수에서 GitHub 리포지토리 정보 가져오기
+const REPO_OWNER = process.env.GITHUB_REPO_OWNER; // 리포지토리 소유자
+const REPO_NAME = process.env.GITHUB_REPO_NAME;
 
 export async function POST(request: NextRequest) {
   try {
     // 세션 확인
     const session = await getServerSession(authOptions);
-    if (!session || !session.accessToken) {
+    if (!session) {
       return NextResponse.json(
         { message: "인증되지 않은 요청입니다." },
         { status: 401 },
       );
     }
+
+    // JWT 토큰에서 액세스 토큰 가져오기 (서버 측에서만)
+    const token = await getToken({ 
+      req: request, 
+      secret: process.env.NEXTAUTH_SECRET 
+    });
+    
+    if (!token?.accessToken) {
+      return NextResponse.json(
+        { message: "인증 토큰이 없습니다." },
+        { status: 401 },
+      );
+    }
+
+    // 현재 로그인한 사용자의 GitHub 유저명을 POST_WRITER로 사용
+    const octokit = new Octokit({
+      auth: token.accessToken as string,
+    });
 
     const { slug, content } = await request.json();
 
@@ -26,21 +46,24 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Octokit 인스턴스 생성
-    const octokit = new Octokit({
-      auth: session.accessToken,
-    });
-
     // 파일 경로
     const path = `posts/${slug}.md`;
 
     // Base64 인코딩
     const contentBase64 = Buffer.from(content).toString("base64");
 
+    // 환경 변수 검증
+    if (!REPO_OWNER || !REPO_NAME) {
+      return NextResponse.json(
+        { message: "GitHub 리포지토리 설정이 필요합니다." },
+        { status: 500 },
+      );
+    }
+
     try {
       // 파일 생성
       const response = await octokit.rest.repos.createOrUpdateFileContents({
-        owner: REPO_OWNER,
+        owner: REPO_OWNER, // 리포지토리 소유자
         repo: REPO_NAME,
         path,
         message: `Add new post: ${slug}`,

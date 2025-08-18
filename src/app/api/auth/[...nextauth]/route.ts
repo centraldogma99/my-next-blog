@@ -29,14 +29,14 @@ export const authOptions: NextAuthOptions = {
       return false;
     },
     async session({ session, token }) {
-      // 세션에 GitHub 사용자명과 액세스 토큰 추가
+      // 세션에 GitHub 사용자명 추가
       if (token) {
         // 관리자 권한 확인
         const allowedEmails =
           process.env.ALLOWED_EMAILS?.split(",").map((email) => email.trim()) ||
           [];
-        const isAdmin = session.user?.email 
-          ? allowedEmails.includes(session.user.email) 
+        const isAdmin = session.user?.email
+          ? allowedEmails.includes(session.user.email)
           : false;
 
         session.user = {
@@ -44,7 +44,6 @@ export const authOptions: NextAuthOptions = {
           username: token.username as string,
           isAdmin,
         };
-        session.accessToken = token.accessToken as string;
       }
       return session;
     },
