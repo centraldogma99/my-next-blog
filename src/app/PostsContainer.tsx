@@ -3,7 +3,7 @@
 import { useState } from "react";
 import PostsList from "./PostsList";
 import DraftToggle from "./DraftToggle";
-import type { BlogPost } from "@/utils/githubBlogPost";
+import type { BlogPost } from "@/utils/api/github";
 
 interface PostsContainerProps {
   posts: BlogPost[];

@@ -1,5 +1,5 @@
 import { MetadataRoute } from "next";
-import { fetchBlogPosts } from "@/utils/githubBlogPost";
+import { fetchBlogPosts } from "@/utils/api/github";
 import { DOMAIN } from "@/constants/domain";
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {

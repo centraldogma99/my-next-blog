@@ -1,5 +1,5 @@
+import { isValidFrontmatter, parseContent } from "@/utils/frontmatter";
 import { describe, it, expect } from "vitest";
-import { parseContent, isValidFrontmatter } from "../parseFrontmatter";
 
 describe("parseFrontmatter", () => {
   it("유효한 frontmatter를 파싱한다", () => {
@@ -118,7 +118,6 @@ tag:
     const markdown = `---
 title: '작은 따옴표 제목'
 subtitle: "큰 따옴표 부제목"
-description: 따옴표 없는 설명
 date: 2025-08-01
 draft: false
 tag:
@@ -131,14 +130,12 @@ tag:
 
     expect(result.frontmatter.title).toBe("작은 따옴표 제목");
     expect(result.frontmatter.subtitle).toBe("큰 따옴표 부제목");
-    expect(result.frontmatter.description).toBe("따옴표 없는 설명");
   });
 
   it("중간에 따옴표가 포함된 텍스트를 올바르게 파싱한다", () => {
     const markdown = `---
 title: JavaScript의 "this" 키워드와 '화살표 함수' 이해하기
 subtitle: "Hello World"를 넘어선 'Real' 프로그래밍
-description: It's a beautiful day, isn't it?
 date: 2025-08-01
 draft: false
 tag:
@@ -154,9 +151,6 @@ tag:
     );
     expect(result.frontmatter.subtitle).toBe(
       "\"Hello World\"를 넘어선 'Real' 프로그래밍",
-    );
-    expect(result.frontmatter.description).toBe(
-      "It's a beautiful day, isn't it?",
     );
   });
 

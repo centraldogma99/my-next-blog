@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { extractHeadingsFromContents } from "../extractHeadingsFromContents";
+import { extractHeadingsFromContents } from "../contentProcessing";
 
 describe("extractHeadingsFromContents", () => {
   it("빈 콘텐츠에서 빈 배열을 반환해야 함", () => {

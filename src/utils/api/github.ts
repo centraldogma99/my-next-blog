@@ -1,8 +1,87 @@
+import { NextResponse } from "next/server";
+import { notFound } from "next/navigation";
+import { Octokit } from "octokit";
 import type { GetContentsResponse } from "@/types/githubAPI/getContents";
 import type { GetContentsDetailData } from "@/types/githubAPI/getContentsDetail";
-import { decodeBase64Content } from "@/utils/decodeBase64Content";
-import { fetchBlogPostsGithubAPI } from "@/utils/fetchGithubAPI";
-import { parseContent, type Frontmatter } from "@/utils/parseFrontmatter";
+import { decodeBase64String } from "@/utils/decodeBase64String";
+import { parseContent, type Frontmatter } from "@/utils/frontmatter";
+
+export interface GitHubConfig {
+  owner: string;
+  repo: string;
+}
+
+export function validateGitHubConfig(): GitHubConfig | NextResponse {
+  const owner = process.env.GITHUB_REPO_OWNER;
+  const repo = process.env.GITHUB_REPO_NAME;
+
+  if (!owner || !repo) {
+    return NextResponse.json(
+      { message: "GitHub 리포지토리 설정이 필요합니다." },
+      { status: 500 },
+    );
+  }
+
+  return { owner, repo };
+}
+
+export interface CommitterInfo {
+  name: string;
+  email: string;
+}
+
+export function getCommitterInfo(user?: {
+  name?: string | null;
+  email?: string | null;
+}): CommitterInfo {
+  return {
+    name: user?.name || "Anonymous",
+    email: user?.email || "anonymous@example.com",
+  };
+}
+
+export async function getFileSHA(
+  octokit: Octokit,
+  config: GitHubConfig,
+  path: string,
+): Promise<string | null> {
+  try {
+    const { data: fileData } = await octokit.rest.repos.getContent({
+      owner: config.owner,
+      repo: config.repo,
+      path,
+    });
+
+    if ("sha" in fileData) {
+      return fileData.sha;
+    }
+    return null;
+  } catch (error) {
+    console.error("Error getting file SHA:", error);
+    return null;
+  }
+}
+
+export const fetchBlogPostsGithubAPI = async <T>(url: string) => {
+  const response = await fetch(
+    `https://api.github.com/repos/centraldogma99/dogma-blog-posts${url}`,
+    {
+      headers: {
+        Authorization: `Bearer ${process.env.GITHUB_API_KEY}`,
+        Accept: "application/vnd.github.v3+json",
+      },
+    },
+  );
+  const data = await response.json();
+  if ("message" in data) {
+    if (data.message.includes("Not Found")) {
+      notFound();
+    } else {
+      throw new Error(data.message);
+    }
+  }
+  return data as T;
+};
 
 export interface BlogPost {
   slug: string;
@@ -80,7 +159,7 @@ export async function fetchSingleBlogPost(
     `/contents/posts/${fileName}`,
   );
 
-  const decodedContent = decodeBase64Content(data.content);
+  const decodedContent = decodeBase64String(data.content);
   const { frontmatter, content } = parseContent(decodedContent);
 
   // .md 또는 .mdx 확장자 제거

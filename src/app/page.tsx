@@ -1,5 +1,5 @@
 import PostsContainer from "@/app/PostsContainer";
-import { fetchBlogPosts, getTagCounts } from "@/utils/githubBlogPost";
+import { fetchBlogPosts, getTagCounts } from "@/utils/api/github";
 
 export const revalidate = 120; // 120초(2분)마다 ISR 리밸리데이션
 

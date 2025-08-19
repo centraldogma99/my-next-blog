@@ -5,12 +5,12 @@ import {
 } from "@/app/posts/[slug]/(components)/CodeBlock";
 import { HashScrollHandler } from "@/app/posts/[slug]/(components)/HashScrollHandler";
 import { HeadingWithAnchor } from "@/app/posts/[slug]/(components)/HeadingWithAnchor";
-import { extractHeadingsFromContents } from "@/utils/extractHeadingsFromContents";
+import { extractHeadingsFromContents } from "@/utils/contentProcessing";
 import {
   fetchBlogPosts,
   fetchSingleBlogPost,
   isPostPublished,
-} from "@/utils/githubBlogPost";
+} from "@/utils/api/github";
 import { AUTHOR_NAME } from "@/constants/site";
 import type { ReactNode } from "react";
 import React from "react";
@@ -18,6 +18,7 @@ import Markdown from "react-markdown";
 import type { Metadata } from "next";
 import { TableOfContents } from "@/app/posts/[slug]/(components)/TableOfContents";
 import { notFound } from "next/navigation";
+import AdminButtons from "@/components/AdminButtons";
 import Script from "next/script";
 
 const getChildrenCodeTag = (node: ReactNode) => {
@@ -57,13 +58,13 @@ export async function generateMetadata({
     return {
       title: frontmatter.title,
       description:
-        frontmatter.description || `${frontmatter.title}에 대한 글입니다.`,
+        frontmatter.subtitle || `${frontmatter.title}에 대한 글입니다.`,
       keywords: frontmatter.tag,
       authors: [{ name: AUTHOR_NAME }],
       openGraph: {
         title: frontmatter.title,
         description:
-          frontmatter.description || `${frontmatter.title}에 대한 글입니다.`,
+          frontmatter.subtitle || `${frontmatter.title}에 대한 글입니다.`,
         type: "article",
         publishedTime: frontmatter.date,
         authors: [AUTHOR_NAME],
@@ -73,7 +74,7 @@ export async function generateMetadata({
         card: "summary_large_image",
         title: frontmatter.title,
         description:
-          frontmatter.description || `${frontmatter.title}에 대한 글입니다.`,
+          frontmatter.subtitle || `${frontmatter.title}에 대한 글입니다.`,
       },
     };
   } catch {
@@ -130,7 +131,7 @@ export default async function Post({
     "@type": "BlogPosting",
     headline: frontmatter.title,
     description:
-      frontmatter.description || `${frontmatter.title}에 대한 글입니다.`,
+      frontmatter.subtitle || `${frontmatter.title}에 대한 글입니다.`,
     datePublished: frontmatter.date,
     dateModified: frontmatter.date,
     author: {
@@ -185,14 +186,17 @@ export default async function Post({
           />
           <div className="flex-1 py-6 pt-12 pb-24 px-6 min-w-0">
             <div className="max-w-4xl mx-auto">
-              <h1 className="break-keep">
-                {frontmatter.title}
-                {frontmatter.draft && (
-                  <span className="ml-3 px-3 py-1 text-base bg-yellow-500 text-white rounded">
-                    DRAFT
-                  </span>
-                )}
-              </h1>
+              <div className="flex items-start justify-between gap-4 mb-6">
+                <h1 className="break-keep flex-1">
+                  {frontmatter.title}
+                  {frontmatter.draft && (
+                    <span className="ml-3 px-3 py-1 text-base bg-yellow-500 text-white rounded">
+                      DRAFT
+                    </span>
+                  )}
+                </h1>
+                <AdminButtons slug={slug} isDraft={frontmatter.draft} />
+              </div>
               <Markdown
                 components={{
                   h1: createHeadingComponent(1, "mt-30"),
