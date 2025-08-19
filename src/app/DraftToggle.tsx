@@ -17,8 +17,6 @@ export default function DraftToggle({
   const [isExpanded, setIsExpanded] = useState(false);
 
   const handleToggle = () => {
-    onToggle();
-
     // URL 파라미터 업데이트
     const params = new URLSearchParams(searchParams.toString());
     if (!showDrafts) {
@@ -28,6 +26,7 @@ export default function DraftToggle({
     }
 
     router.push(`?${params.toString()}`);
+    onToggle();
   };
 
   return (
