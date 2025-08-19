@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useState } from "react";
 import TabFilter from "./TabFilter";
 import { pretendard } from "@/app/fonts";
-import type { BlogPost } from "@/utils/githubBlogPost";
+import type { BlogPost } from "@/utils/api/github";
 
 interface TabViewProps {
   posts: BlogPost[];

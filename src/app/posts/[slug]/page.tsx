@@ -5,12 +5,12 @@ import {
 } from "@/app/posts/[slug]/(components)/CodeBlock";
 import { HashScrollHandler } from "@/app/posts/[slug]/(components)/HashScrollHandler";
 import { HeadingWithAnchor } from "@/app/posts/[slug]/(components)/HeadingWithAnchor";
-import { extractHeadingsFromContents } from "@/utils/extractHeadingsFromContents";
+import { extractHeadingsFromContents } from "@/utils/contentProcessing";
 import {
   fetchBlogPosts,
   fetchSingleBlogPost,
   isPostPublished,
-} from "@/utils/githubBlogPost";
+} from "@/utils/api/github";
 import { AUTHOR_NAME } from "@/constants/site";
 import type { ReactNode } from "react";
 import React from "react";

@@ -1,5 +1,5 @@
 import { ImageResponse } from "next/og";
-import { fetchSingleBlogPost } from "@/utils/githubBlogPost";
+import { fetchSingleBlogPost } from "@/utils/api/github";
 import { SITE_NAME } from "@/constants/site";
 
 export const runtime = "edge";

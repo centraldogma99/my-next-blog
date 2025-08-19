@@ -1,5 +1,5 @@
+import { isValidFrontmatter, parseContent } from "@/utils/frontmatter";
 import { describe, it, expect } from "vitest";
-import { parseContent, isValidFrontmatter } from "../parseFrontmatter";
 
 describe("parseFrontmatter", () => {
   it("유효한 frontmatter를 파싱한다", () => {

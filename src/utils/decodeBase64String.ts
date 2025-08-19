@@ -1,4 +1,4 @@
-export const decodeBase64Content = (base64String: string): string => {
+export const decodeBase64String = (base64String: string): string => {
   try {
     // Node.js 환경에서 Buffer 사용
     return Buffer.from(base64String, "base64").toString("utf-8");

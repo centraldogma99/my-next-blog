@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { fetchSingleBlogPost } from "@/utils/githubBlogPost";
+import { fetchSingleBlogPost } from "@/utils/api/github";
 import { 
   createAuthenticatedHandler,
   getCommitterInfo,
