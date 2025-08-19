@@ -18,7 +18,7 @@ export default function AuthButton() {
     return (
       <button
         onClick={() => signOut()}
-        className="p-2 rounded-lg bg-[var(--color-bg-secondary)] hover:bg-[var(--color-bg-tertiary)] border border-[var(--color-border)] transition-colors flex items-center gap-2"
+        className="p-2 rounded-lg bg-[var(--color-bg-secondary)] hover:bg-[var(--color-primary-hover)] hover:text-white border border-[var(--color-border)] hover:border-[var(--color-primary)] transition-all duration-200 flex items-center gap-2"
         title={`로그아웃 (${session.user?.username})`}
       >
         <LogOut className="w-5 h-5" />
@@ -30,11 +30,11 @@ export default function AuthButton() {
   return (
     <button
       onClick={() => signIn("github")}
-      className="p-2 rounded-lg bg-[var(--color-bg-secondary)] hover:bg-[var(--color-bg-tertiary)] border border-[var(--color-border)] transition-colors flex items-center gap-2"
+      className="p-2 rounded-lg bg-[var(--color-bg-secondary)] hover:bg-[var(--color-primary-hover)] hover:text-white border border-[var(--color-border)] hover:border-[var(--color-primary)] transition-all duration-200 flex items-center gap-2"
       title="GitHub로 로그인"
     >
       <LogIn className="w-5 h-5" />
-      <span className="hidden sm:inline">로그인</span>
+      <span className="hidden sm:inline">Github 로그인</span>
     </button>
   );
 }

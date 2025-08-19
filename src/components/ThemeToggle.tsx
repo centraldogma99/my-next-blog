@@ -12,7 +12,7 @@ export function ThemeToggle() {
   return (
     <button
       onClick={handleToggle}
-      className="p-2 rounded-lg bg-gray-100 hover:bg-gray-200 dark:bg-gray-800 dark:hover:bg-gray-700 transition-all duration-200 shadow-sm hover:shadow-md"
+      className="p-[10px] rounded-lg bg-[var(--color-bg-secondary)] hover:bg-[var(--color-primary-hover)] hover:text-white border border-[var(--color-border)] hover:border-[var(--color-primary)] transition-all duration-200"
       title={`현재: ${theme === "dark" ? "다크" : "라이트"} 모드`}
     >
       {theme === "dark" ? (
