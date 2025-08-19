@@ -18,7 +18,7 @@ export function isAdmin(session: Session | null): boolean {
     // 클라이언트 환경
     return session?.user?.isAdmin === true;
   }
-  
+
   // 서버 환경
   if (!session?.user?.email) {
     return false;
