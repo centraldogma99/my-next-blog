@@ -3,24 +3,39 @@ import {
   createAuthenticatedHandler,
   getCommitterInfo
 } from "@/utils/api";
+import { generateFrontmatterString, type Frontmatter } from "@/utils/frontmatter";
 
 export const POST = createAuthenticatedHandler(async (context) => {
   const { request, octokit, githubConfig, user } = context;
   
-  const { slug, content } = await request.json();
+  const { slug, frontmatter, content } = await request.json() as {
+    slug: string;
+    frontmatter: Partial<Frontmatter> & { title: string; date?: string; tag?: string[]; draft?: boolean };
+    content: string;
+  };
 
-  if (!slug || !content) {
+  if (!slug || !frontmatter?.title || !content) {
     return NextResponse.json(
-      { message: "slug와 content는 필수입니다." },
+      { message: "slug, frontmatter.title, content는 필수입니다." },
       { status: 400 }
     );
   }
 
+  // frontmatter 객체에서 문자열 생성
+  const frontmatterString = generateFrontmatterString({
+    ...frontmatter,
+    date: frontmatter.date || new Date().toISOString().split('T')[0],
+    tag: frontmatter.tag || [],
+    draft: frontmatter.draft ?? true,
+    slug
+  });
+
   // 파일 경로
   const path = `posts/${slug}.md`;
 
-  // Base64 인코딩
-  const contentBase64 = Buffer.from(content).toString("base64");
+  // 전체 콘텐츠 생성 및 Base64 인코딩
+  const fullContent = frontmatterString + content;
+  const contentBase64 = Buffer.from(fullContent).toString("base64");
 
   try {
     // 파일 생성
