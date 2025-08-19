@@ -37,7 +37,7 @@ export default function PostsContainer({
       {showDraftToggle && (
         <DraftToggle 
           showDrafts={showDrafts} 
-          onToggle={() => setShowDrafts(!showDrafts)} 
+          onToggle={() => setShowDrafts(!showDrafts)}
         />
       )}
     </>
