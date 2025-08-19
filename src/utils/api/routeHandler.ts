@@ -37,7 +37,7 @@ export function createAuthenticatedHandler<T = unknown>(
 ) {
   return async (
     request: NextRequest,
-    context?: { params: Promise<T> },
+    context: { params: Promise<T> },
   ): Promise<NextResponse> => {
     try {
       const authResult = await validateAuth(request);
@@ -87,4 +87,3 @@ export function createAuthenticatedHandler<T = unknown>(
     }
   };
 }
-
