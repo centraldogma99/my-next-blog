@@ -32,7 +32,15 @@ export async function GET(
 // PUT: 포스트 수정 - 인증 필요
 export const PUT = createAuthenticatedHandler<RouteParams>(async (context, params) => {
   const { request, octokit, githubConfig, user } = context;
-  const { slug } = params!;
+  
+  if (!params) {
+    return NextResponse.json(
+      { message: "잘못된 요청입니다." },
+      { status: 400 }
+    );
+  }
+  
+  const { slug } = params;
 
   const { content } = await request.json();
 
@@ -78,7 +86,15 @@ export const PUT = createAuthenticatedHandler<RouteParams>(async (context, param
 // DELETE: 포스트 삭제 - 인증 필요
 export const DELETE = createAuthenticatedHandler<RouteParams>(async (context, params) => {
   const { octokit, githubConfig, user } = context;
-  const { slug } = params!;
+  
+  if (!params) {
+    return NextResponse.json(
+      { message: "잘못된 요청입니다." },
+      { status: 400 }
+    );
+  }
+  
+  const { slug } = params;
 
   // 파일 경로
   const path = `posts/${slug}.md`;

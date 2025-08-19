@@ -12,7 +12,15 @@ interface RouteParams {
 
 export const POST = createAuthenticatedHandler<RouteParams>(async (context, params) => {
   const { octokit, githubConfig, user } = context;
-  const { slug } = params!;
+  
+  if (!params) {
+    return NextResponse.json(
+      { message: "잘못된 요청입니다." },
+      { status: 400 }
+    );
+  }
+  
+  const { slug } = params;
   const fileName = `${slug}.md`;
 
   // 현재 포스트 내용 가져오기
