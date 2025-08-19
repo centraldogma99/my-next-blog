@@ -1,210 +1,109 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getServerSession } from "next-auth";
-import { authOptions } from "@/app/api/auth/[...nextauth]/route";
-import { Octokit } from "octokit";
 import { fetchSingleBlogPost } from "@/utils/githubBlogPost";
-import { getToken } from "next-auth/jwt";
+import { 
+  createAuthenticatedHandler,
+  getCommitterInfo,
+  getFileSHA
+} from "@/utils/api";
 
-// 환경 변수에서 GitHub 리포지토리 정보 가져오기
-const REPO_OWNER = process.env.GITHUB_REPO_OWNER;
-const REPO_NAME = process.env.GITHUB_REPO_NAME;
+interface RouteParams {
+  slug: string;
+}
 
-// GET: 포스트 조회 (편집용)
+// GET: 포스트 조회 (편집용) - 인증 불필요
 export async function GET(
   request: NextRequest,
-  { params }: { params: Promise<{ slug: string }> },
-) {
+  context: { params: Promise<RouteParams> }
+): Promise<NextResponse> {
   try {
-    const { slug } = await params;
+    const params = await context.params;
+    const { slug } = params;
     const post = await fetchSingleBlogPost(`${slug}.md`, true);
     return NextResponse.json(post);
   } catch (error) {
     console.error("Error fetching post:", error);
     return NextResponse.json(
       { message: "포스트를 찾을 수 없습니다." },
-      { status: 404 },
+      { status: 404 }
     );
   }
-}
+};
 
-// PUT: 포스트 수정
-export async function PUT(
-  request: NextRequest,
-  { params }: { params: Promise<{ slug: string }> },
-) {
-  try {
-    const { slug } = await params;
-    // 세션 확인
-    const session = await getServerSession(authOptions);
-    if (!session) {
-      return NextResponse.json(
-        { message: "인증되지 않은 요청입니다." },
-        { status: 401 },
-      );
-    }
+// PUT: 포스트 수정 - 인증 필요
+export const PUT = createAuthenticatedHandler<RouteParams>(async (context, params) => {
+  const { request, octokit, githubConfig, user } = context;
+  const { slug } = params!;
 
-    const token = await getToken({
-      req: request,
-      secret: process.env.NEXTAUTH_SECRET,
-    });
+  const { content } = await request.json();
 
-    if (!token?.accessToken) {
-      return NextResponse.json(
-        { message: "인증 토큰이 없습니다." },
-        { status: 401 },
-      );
-    }
-
-    const { content } = await request.json();
-
-    if (!content) {
-      return NextResponse.json(
-        { message: "content는 필수입니다." },
-        { status: 400 },
-      );
-    }
-
-    // Octokit 인스턴스 생성
-    const octokit = new Octokit({
-      auth: token.accessToken as string,
-    });
-
-    // 파일 경로
-    const path = `posts/${slug}.md`;
-
-    // 환경 변수 검증
-    if (!REPO_OWNER || !REPO_NAME) {
-      return NextResponse.json(
-        { message: "GitHub 리포지토리 설정이 필요합니다." },
-        { status: 500 },
-      );
-    }
-
-    // 현재 파일의 SHA 가져오기
-    const { data: fileData } = await octokit.rest.repos.getContent({
-      owner: REPO_OWNER,
-      repo: REPO_NAME,
-      path,
-    });
-
-    if (!("sha" in fileData)) {
-      return NextResponse.json(
-        { message: "파일 정보를 가져올 수 없습니다." },
-        { status: 500 },
-      );
-    }
-
-    // Base64 인코딩
-    const contentBase64 = Buffer.from(content).toString("base64");
-
-    // 파일 업데이트
-    const response = await octokit.rest.repos.createOrUpdateFileContents({
-      owner: REPO_OWNER,
-      repo: REPO_NAME,
-      path,
-      message: `Update post: ${slug}`,
-      content: contentBase64,
-      sha: fileData.sha,
-      committer: {
-        name: session.user?.name || "Anonymous",
-        email: session.user?.email || "anonymous@example.com",
-      },
-    });
-
-    return NextResponse.json({
-      message: "포스트가 성공적으로 수정되었습니다.",
-      data: response.data,
-    });
-  } catch (error) {
-    console.error("Error updating post:", error);
+  if (!content) {
     return NextResponse.json(
-      { message: "포스트 수정 중 오류가 발생했습니다." },
-      { status: 500 },
+      { message: "content는 필수입니다." },
+      { status: 400 }
     );
   }
-}
 
-// DELETE: 포스트 삭제
-export async function DELETE(
-  request: NextRequest,
-  { params }: { params: Promise<{ slug: string }> },
-) {
-  const { slug } = await params;
-  try {
-    // 세션 확인
-    const session = await getServerSession(authOptions);
-    if (!session) {
-      return NextResponse.json(
-        { message: "인증되지 않은 요청입니다." },
-        { status: 401 },
-      );
-    }
+  // 파일 경로
+  const path = `posts/${slug}.md`;
 
-    // JWT 토큰에서 액세스 토큰 가져오기 (서버 측에서만)
-    const token = await getToken({ 
-      req: request, 
-      secret: process.env.NEXTAUTH_SECRET 
-    });
-    
-    if (!token?.accessToken) {
-      return NextResponse.json(
-        { message: "인증 토큰이 없습니다." },
-        { status: 401 },
-      );
-    }
-
-    // Octokit 인스턴스 생성
-    const octokit = new Octokit({
-      auth: token.accessToken as string,
-    });
-
-    // 파일 경로
-    const path = `posts/${slug}.md`;
-
-    // 환경 변수 검증
-    if (!REPO_OWNER || !REPO_NAME) {
-      return NextResponse.json(
-        { message: "GitHub 리포지토리 설정이 필요합니다." },
-        { status: 500 },
-      );
-    }
-
-    // 현재 파일의 SHA 가져오기
-    const { data: fileData } = await octokit.rest.repos.getContent({
-      owner: REPO_OWNER,
-      repo: REPO_NAME,
-      path,
-    });
-
-    if (!("sha" in fileData)) {
-      return NextResponse.json(
-        { message: "파일 정보를 가져올 수 없습니다." },
-        { status: 500 },
-      );
-    }
-
-    // 파일 삭제
-    const response = await octokit.rest.repos.deleteFile({
-      owner: REPO_OWNER,
-      repo: REPO_NAME,
-      path,
-      message: `Delete post: ${slug}`,
-      sha: fileData.sha,
-      committer: {
-        name: session.user?.name || "Anonymous",
-        email: session.user?.email || "anonymous@example.com",
-      },
-    });
-
-    return NextResponse.json({
-      message: "포스트가 성공적으로 삭제되었습니다.",
-      data: response.data,
-    });
-  } catch (error) {
-    console.error("Error deleting post:", error);
+  // 현재 파일의 SHA 가져오기
+  const sha = await getFileSHA(octokit, githubConfig, path);
+  if (!sha) {
     return NextResponse.json(
-      { message: "포스트 삭제 중 오류가 발생했습니다." },
-      { status: 500 },
+      { message: "파일 정보를 가져올 수 없습니다." },
+      { status: 500 }
     );
   }
-}
+
+  // Base64 인코딩
+  const contentBase64 = Buffer.from(content).toString("base64");
+
+  // 파일 업데이트
+  const response = await octokit.rest.repos.createOrUpdateFileContents({
+    owner: githubConfig.owner,
+    repo: githubConfig.repo,
+    path,
+    message: `Update post: ${slug}`,
+    content: contentBase64,
+    sha,
+    committer: getCommitterInfo(user),
+  });
+
+  return NextResponse.json({
+    message: "포스트가 성공적으로 수정되었습니다.",
+    data: response.data
+  });
+});
+
+// DELETE: 포스트 삭제 - 인증 필요
+export const DELETE = createAuthenticatedHandler<RouteParams>(async (context, params) => {
+  const { octokit, githubConfig, user } = context;
+  const { slug } = params!;
+
+  // 파일 경로
+  const path = `posts/${slug}.md`;
+
+  // 현재 파일의 SHA 가져오기
+  const sha = await getFileSHA(octokit, githubConfig, path);
+  if (!sha) {
+    return NextResponse.json(
+      { message: "파일 정보를 가져올 수 없습니다." },
+      { status: 500 }
+    );
+  }
+
+  // 파일 삭제
+  const response = await octokit.rest.repos.deleteFile({
+    owner: githubConfig.owner,
+    repo: githubConfig.repo,
+    path,
+    message: `Delete post: ${slug}`,
+    sha,
+    committer: getCommitterInfo(user),
+  });
+
+  return NextResponse.json({
+    message: "포스트가 성공적으로 삭제되었습니다.",
+    data: response.data
+  });
+});
