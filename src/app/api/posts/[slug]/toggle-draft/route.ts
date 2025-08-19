@@ -5,7 +5,7 @@ import {
   getCommitterInfo,
   getFileSHA,
 } from "@/utils/api";
-import { generateFrontmatter } from "@/utils/frontmatter";
+import { generateFrontmatterString } from "@/utils/frontmatter";
 
 interface RouteParams {
   slug: string;
@@ -32,16 +32,15 @@ export const POST = createAuthenticatedHandler<RouteParams>(
     // draft 상태 토글
     const newDraftState = !frontmatter.draft;
 
-    // FormData 생성하여 generateFrontmatter 함수 활용
-    const formData = new FormData();
-    formData.append("title", frontmatter.title);
-    formData.append("date", frontmatter.date);
-    formData.append("tags", frontmatter.tag?.join(", ") || "");
-    formData.append("description", frontmatter.description || "");
-    formData.append("draft", newDraftState.toString());
-
-    // generateFrontmatter 함수로 frontmatter 생성
-    const updatedFrontmatter = generateFrontmatter(formData);
+    // generateFrontmatterString 함수로 frontmatter 생성
+    const updatedFrontmatter = generateFrontmatterString({
+      title: frontmatter.title,
+      date: frontmatter.date,
+      tag: frontmatter.tag || [],
+      description: frontmatter.description,
+      draft: newDraftState,
+      slug,
+    });
 
     const updatedContent = `${updatedFrontmatter}${content}`;
 

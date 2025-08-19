@@ -1,3 +1,10 @@
+// 현재 날짜를 YYYY-MM-DD 형식으로 반환하는 헬퍼 함수
+function getCurrentDate(): string {
+  const now = new Date();
+  return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}-${String(now.getDate()).padStart(2, "0")}`;
+}
+
+// FormData를 위한 헬퍼 함수 (하위 호환성 유지)
 export function generateFrontmatter(formData: FormData): string {
   const title = formData.get("title") as string;
   const tags = formData.get("tags") as string;
@@ -11,40 +18,59 @@ export function generateFrontmatter(formData: FormData): string {
     .map((tag) => tag.trim())
     .filter((tag) => tag.length > 0);
 
+  const frontmatterObj: Partial<Frontmatter> & {
+    title: string;
+    date: string;
+    slug?: string;
+  } = {
+    title,
+    date: date || getCurrentDate(),
+    tag: tagsArray,
+    draft: draft === "true",
+    ...(description && { subtitle: description }),
+    ...(slug && { slug }),
+  };
+
+  return generateFrontmatterString(frontmatterObj);
+}
+
+// 개선된 generateFrontmatterString - 객체를 받음
+export function generateFrontmatterString(
+  frontmatter: Partial<Frontmatter> & {
+    title: string;
+    date: string;
+    slug?: string;
+  },
+): string {
   // 날짜가 제공되지 않으면 현재 날짜 사용
-  const formattedDate =
-    date ||
-    (() => {
-      const now = new Date();
-      return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}-${String(now.getDate()).padStart(2, "0")}`;
-    })();
+  const formattedDate = frontmatter.date || getCurrentDate();
 
-  let frontmatter = "---\n";
-  frontmatter += `title: "${title}"\n`;
-  frontmatter += `date: "${formattedDate}"\n`;
+  let frontmatterStr = "---\n";
+  frontmatterStr += `title: "${frontmatter.title}"\n`;
+  frontmatterStr += `date: "${formattedDate}"\n`;
 
-  if (tagsArray.length > 0) {
+  if (frontmatter.tag && frontmatter.tag.length > 0) {
     // YAML 리스트 형식으로 태그 추가
-    frontmatter += "tag:\n";
-    tagsArray.forEach((tag) => {
-      frontmatter += `  - ${tag}\n`;
+    frontmatterStr += "tag:\n";
+    frontmatter.tag.forEach((tag) => {
+      frontmatterStr += `  - ${tag}\n`;
     });
   }
 
-  if (description) {
-    frontmatter += `description: "${description}"\n`;
+  if (frontmatter.description) {
+    frontmatterStr += `description: "${frontmatter.description}"\n`;
   }
 
-  if (slug) {
-    frontmatter += `slug: "${slug}"\n`;
+  if (frontmatter.slug) {
+    frontmatterStr += `slug: "${frontmatter.slug}"\n`;
   }
 
   // draft 필드는 항상 포함
-  frontmatter += `draft: ${draft === "true" ? "true" : "false"}\n`;
+  frontmatterStr += `draft: ${frontmatter.draft === true ? "true" : "false"}\n`;
 
-  frontmatter += "---\n\n";
+  frontmatterStr += "---\n\n";
 
-  return frontmatter;
+  return frontmatterStr;
 }
 
 interface ParseResult {
