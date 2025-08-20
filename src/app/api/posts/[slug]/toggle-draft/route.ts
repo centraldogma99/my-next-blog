@@ -39,7 +39,6 @@ export const POST = createAuthenticatedHandler<RouteParams>(
       tag: frontmatter.tag || [],
       description: frontmatter.description,
       draft: newDraftState,
-      slug,
     });
 
     const updatedContent = `${updatedFrontmatter}${content}`;

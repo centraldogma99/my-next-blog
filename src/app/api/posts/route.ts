@@ -1,34 +1,35 @@
 import { NextResponse } from "next/server";
-import { 
-  createAuthenticatedHandler,
-  getCommitterInfo
-} from "@/utils/api";
-import { generateFrontmatterString, type Frontmatter } from "@/utils/frontmatter";
+import { createAuthenticatedHandler, getCommitterInfo } from "@/utils/api";
+import {
+  generateFrontmatterString,
+  type Frontmatter,
+} from "@/utils/frontmatter";
 
 export const POST = createAuthenticatedHandler(async (context) => {
   const { request, octokit, githubConfig, user } = context;
-  
-  const { slug, frontmatter, content } = await request.json() as {
+
+  const { slug, frontmatter, content } = (await request.json()) as {
     slug: string;
-    frontmatter: Partial<Frontmatter> & { title: string; date?: string; tag?: string[]; draft?: boolean };
+    frontmatter: Frontmatter;
     content: string;
   };
 
-  if (!slug || !frontmatter?.title || !content) {
+  if (
+    !slug ||
+    !frontmatter?.title ||
+    !content ||
+    !frontmatter?.date ||
+    !frontmatter?.tag ||
+    frontmatter?.draft === undefined
+  ) {
     return NextResponse.json(
-      { message: "slug, frontmatter.title, content는 필수입니다." },
-      { status: 400 }
+      { message: "잘못된 요청입니다." },
+      { status: 400 },
     );
   }
 
   // frontmatter 객체에서 문자열 생성
-  const frontmatterString = generateFrontmatterString({
-    ...frontmatter,
-    date: frontmatter.date || new Date().toISOString().split('T')[0],
-    tag: frontmatter.tag || [],
-    draft: frontmatter.draft ?? true,
-    slug
-  });
+  const frontmatterString = generateFrontmatterString(frontmatter);
 
   // 파일 경로
   const path = `posts/${slug}.md`;
@@ -50,14 +51,14 @@ export const POST = createAuthenticatedHandler(async (context) => {
 
     return NextResponse.json({
       message: "포스트가 성공적으로 생성되었습니다.",
-      data: response.data
+      data: response.data,
     });
   } catch (error) {
     // 이미 파일이 존재하는 경우
     if (error instanceof Error && "status" in error && error.status === 422) {
       return NextResponse.json(
         { message: "이미 존재하는 파일명입니다." },
-        { status: 409 }
+        { status: 409 },
       );
     }
     throw error;

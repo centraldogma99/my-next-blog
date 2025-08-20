@@ -1,11 +1,14 @@
 import { NextRequest, NextResponse } from "next/server";
 import { fetchSingleBlogPost } from "@/utils/api/github";
-import { 
+import {
   createAuthenticatedHandler,
   getCommitterInfo,
-  getFileSHA
+  getFileSHA,
 } from "@/utils/api";
-import { generateFrontmatterString, type Frontmatter } from "@/utils/frontmatter";
+import {
+  generateFrontmatterString,
+  type Frontmatter,
+} from "@/utils/frontmatter";
 
 interface RouteParams {
   slug: string;
@@ -14,7 +17,7 @@ interface RouteParams {
 // GET: 포스트 조회 (편집용) - 인증 불필요
 export async function GET(
   request: NextRequest,
-  context: { params: Promise<RouteParams> }
+  context: { params: Promise<RouteParams> },
 ): Promise<NextResponse> {
   try {
     const params = await context.params;
@@ -25,115 +28,119 @@ export async function GET(
     console.error("Error fetching post:", error);
     return NextResponse.json(
       { message: "포스트를 찾을 수 없습니다." },
-      { status: 404 }
+      { status: 404 },
     );
   }
-};
+}
 
 // PUT: 포스트 수정 - 인증 필요
-export const PUT = createAuthenticatedHandler<RouteParams>(async (context, params) => {
-  const { request, octokit, githubConfig, user } = context;
-  
-  if (!params) {
-    return NextResponse.json(
-      { message: "잘못된 요청입니다." },
-      { status: 400 }
-    );
-  }
-  
-  const { slug } = params;
+export const PUT = createAuthenticatedHandler<RouteParams>(
+  async (context, params) => {
+    const { request, octokit, githubConfig, user } = context;
 
-  const { frontmatter, content } = await request.json() as {
-    frontmatter: Partial<Frontmatter> & { title: string; date?: string; tag?: string[]; draft?: boolean };
-    content: string;
-  };
+    if (!params) {
+      return NextResponse.json(
+        { message: "잘못된 요청입니다." },
+        { status: 400 },
+      );
+    }
 
-  if (!frontmatter?.title || !content) {
-    return NextResponse.json(
-      { message: "frontmatter.title과 content는 필수입니다." },
-      { status: 400 }
-    );
-  }
+    const { slug } = params;
 
-  // frontmatter 객체에서 문자열 생성
-  const frontmatterString = generateFrontmatterString({
-    ...frontmatter,
-    date: frontmatter.date || new Date().toISOString().split('T')[0],
-    tag: frontmatter.tag || [],
-    draft: frontmatter.draft ?? false,
-    slug
-  });
+    const { frontmatter, content } = (await request.json()) as {
+      frontmatter: Frontmatter;
+      content: string;
+    };
 
-  // 파일 경로
-  const path = `posts/${slug}.md`;
+    if (
+      !frontmatter?.title ||
+      !content ||
+      !frontmatter.date ||
+      !frontmatter.tag ||
+      frontmatter.draft === undefined
+    ) {
+      return NextResponse.json(
+        { message: "잘못된 요청입니다." },
+        { status: 400 },
+      );
+    }
 
-  // 현재 파일의 SHA 가져오기
-  const sha = await getFileSHA(octokit, githubConfig, path);
-  if (!sha) {
-    return NextResponse.json(
-      { message: "파일 정보를 가져올 수 없습니다." },
-      { status: 500 }
-    );
-  }
+    // frontmatter 객체에서 문자열 생성
+    const frontmatterString = generateFrontmatterString(frontmatter);
 
-  // 전체 콘텐츠 생성 및 Base64 인코딩
-  const fullContent = frontmatterString + content;
-  const contentBase64 = Buffer.from(fullContent).toString("base64");
+    // 파일 경로
+    const path = `posts/${slug}.md`;
 
-  // 파일 업데이트
-  const response = await octokit.rest.repos.createOrUpdateFileContents({
-    owner: githubConfig.owner,
-    repo: githubConfig.repo,
-    path,
-    message: `Update post: ${slug}`,
-    content: contentBase64,
-    sha,
-    committer: getCommitterInfo(user),
-  });
+    // 현재 파일의 SHA 가져오기
+    const sha = await getFileSHA(octokit, githubConfig, path);
+    if (!sha) {
+      return NextResponse.json(
+        { message: "파일 정보를 가져올 수 없습니다." },
+        { status: 500 },
+      );
+    }
 
-  return NextResponse.json({
-    message: "포스트가 성공적으로 수정되었습니다.",
-    data: response.data
-  });
-});
+    // 전체 콘텐츠 생성 및 Base64 인코딩
+    const fullContent = frontmatterString + content;
+    const contentBase64 = Buffer.from(fullContent).toString("base64");
+
+    // 파일 업데이트
+    const response = await octokit.rest.repos.createOrUpdateFileContents({
+      owner: githubConfig.owner,
+      repo: githubConfig.repo,
+      path,
+      message: `Update post: ${slug}`,
+      content: contentBase64,
+      sha,
+      committer: getCommitterInfo(user),
+    });
+
+    return NextResponse.json({
+      message: "포스트가 성공적으로 수정되었습니다.",
+      data: response.data,
+    });
+  },
+);
 
 // DELETE: 포스트 삭제 - 인증 필요
-export const DELETE = createAuthenticatedHandler<RouteParams>(async (context, params) => {
-  const { octokit, githubConfig, user } = context;
-  
-  if (!params) {
-    return NextResponse.json(
-      { message: "잘못된 요청입니다." },
-      { status: 400 }
-    );
-  }
-  
-  const { slug } = params;
+export const DELETE = createAuthenticatedHandler<RouteParams>(
+  async (context, params) => {
+    const { octokit, githubConfig, user } = context;
 
-  // 파일 경로
-  const path = `posts/${slug}.md`;
+    if (!params) {
+      return NextResponse.json(
+        { message: "잘못된 요청입니다." },
+        { status: 400 },
+      );
+    }
 
-  // 현재 파일의 SHA 가져오기
-  const sha = await getFileSHA(octokit, githubConfig, path);
-  if (!sha) {
-    return NextResponse.json(
-      { message: "파일 정보를 가져올 수 없습니다." },
-      { status: 500 }
-    );
-  }
+    const { slug } = params;
 
-  // 파일 삭제
-  const response = await octokit.rest.repos.deleteFile({
-    owner: githubConfig.owner,
-    repo: githubConfig.repo,
-    path,
-    message: `Delete post: ${slug}`,
-    sha,
-    committer: getCommitterInfo(user),
-  });
+    // 파일 경로
+    const path = `posts/${slug}.md`;
 
-  return NextResponse.json({
-    message: "포스트가 성공적으로 삭제되었습니다.",
-    data: response.data
-  });
-});
+    // 현재 파일의 SHA 가져오기
+    const sha = await getFileSHA(octokit, githubConfig, path);
+    if (!sha) {
+      return NextResponse.json(
+        { message: "파일 정보를 가져올 수 없습니다." },
+        { status: 500 },
+      );
+    }
+
+    // 파일 삭제
+    const response = await octokit.rest.repos.deleteFile({
+      owner: githubConfig.owner,
+      repo: githubConfig.repo,
+      path,
+      message: `Delete post: ${slug}`,
+      sha,
+      committer: getCommitterInfo(user),
+    });
+
+    return NextResponse.json({
+      message: "포스트가 성공적으로 삭제되었습니다.",
+      data: response.data,
+    });
+  },
+);

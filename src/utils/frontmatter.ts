@@ -4,43 +4,9 @@ function getCurrentDate(): string {
   return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}-${String(now.getDate()).padStart(2, "0")}`;
 }
 
-// FormData를 위한 헬퍼 함수 (하위 호환성 유지)
-export function generateFrontmatter(formData: FormData): string {
-  const title = formData.get("title") as string;
-  const tags = formData.get("tags") as string;
-  const description = formData.get("description") as string;
-  const slug = formData.get("slug") as string;
-  const date = formData.get("date") as string;
-  const draft = formData.get("draft") as string;
-
-  const tagsArray = tags
-    .split(",")
-    .map((tag) => tag.trim())
-    .filter((tag) => tag.length > 0);
-
-  const frontmatterObj: Partial<Frontmatter> & {
-    title: string;
-    date: string;
-    slug?: string;
-  } = {
-    title,
-    date: date || getCurrentDate(),
-    tag: tagsArray,
-    draft: draft === "true",
-    ...(description && { subtitle: description }),
-    ...(slug && { slug }),
-  };
-
-  return generateFrontmatterString(frontmatterObj);
-}
-
 // 개선된 generateFrontmatterString - 객체를 받음
 export function generateFrontmatterString(
-  frontmatter: Partial<Frontmatter> & {
-    title: string;
-    date: string;
-    slug?: string;
-  },
+  frontmatter: Partial<Frontmatter> & { title: string; date: string },
 ): string {
   // 날짜가 제공되지 않으면 현재 날짜 사용
   const formattedDate = frontmatter.date || getCurrentDate();
@@ -59,10 +25,6 @@ export function generateFrontmatterString(
 
   if (frontmatter.description) {
     frontmatterStr += `description: "${frontmatter.description}"\n`;
-  }
-
-  if (frontmatter.slug) {
-    frontmatterStr += `slug: "${frontmatter.slug}"\n`;
   }
 
   // draft 필드는 항상 포함
