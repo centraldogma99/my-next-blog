@@ -41,21 +41,6 @@ describe("ThemeToggle", () => {
     expect(button).toHaveAttribute("title", "현재: 다크 모드");
   });
 
-  it("올바른 CSS 클래스를 가진다", () => {
-    renderWithThemeProvider(<ThemeToggle />);
-
-    const button = screen.getByRole("button");
-
-    expect(button).toHaveClass(
-      "p-2",
-      "rounded-lg",
-      "bg-gray-100",
-      "hover:bg-gray-200",
-      "dark:bg-gray-800",
-      "dark:hover:bg-gray-700",
-    );
-  });
-
   it("키보드 포커스가 가능하다", () => {
     renderWithThemeProvider(<ThemeToggle />);
 

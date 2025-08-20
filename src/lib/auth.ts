@@ -1,3 +1,4 @@
+import { isAdmin } from "@/utils/auth";
 import type { NextAuthOptions } from "next-auth";
 import GithubProvider from "next-auth/providers/github";
 
@@ -30,18 +31,10 @@ export const authOptions: NextAuthOptions = {
     async session({ session, token }) {
       // 세션에 GitHub 사용자명 추가
       if (token) {
-        // 관리자 권한 확인
-        const allowedEmails =
-          process.env.ALLOWED_EMAILS?.split(",").map((email) => email.trim()) ||
-          [];
-        const isAdmin = session.user?.email
-          ? allowedEmails.includes(session.user.email)
-          : false;
-
         session.user = {
           ...session.user,
           username: token.username as string,
-          isAdmin,
+          isAdmin: isAdmin(session),
         };
       }
       return session;
