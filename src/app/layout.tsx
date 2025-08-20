@@ -6,12 +6,12 @@ import { Analytics } from "@vercel/analytics/next";
 import { ThemeProvider } from "@/contexts/ThemeContext";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { DEFAULT_THEME } from "@/constants/theme";
-import { DOMAIN } from "@/constants/domain";
 import {
   SITE_NAME,
   AUTHOR_NAME,
   SITE_DESCRIPTION,
   SITE_KEYWORDS,
+  DOMAIN,
 } from "@/constants/site";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 import AuthProvider from "@/components/AuthProvider";
@@ -19,6 +19,7 @@ import AuthButton from "@/components/AuthButton";
 import NewPostButton from "@/components/NewPostButton";
 
 export const metadata: Metadata = {
+  metadataBase: new URL(DOMAIN),
   title: {
     default: SITE_NAME,
     template: `%s | ${SITE_NAME}`,
