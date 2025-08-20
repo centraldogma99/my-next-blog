@@ -18,7 +18,7 @@ export default async function Image({
 }) {
   const { slug } = await params;
 
-  const post = await fetchSingleBlogPost(slug, false);
+  const post = await fetchSingleBlogPost(`${slug}.md`, false);
   const title = post.frontmatter.title;
 
   return new ImageResponse(
