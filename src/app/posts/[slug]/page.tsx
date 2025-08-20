@@ -20,6 +20,8 @@ import { TableOfContents } from "@/app/posts/[slug]/(components)/TableOfContents
 import { notFound } from "next/navigation";
 import AdminButtons from "@/components/AdminButtons";
 import Script from "next/script";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/lib/auth";
 
 const getChildrenCodeTag = (node: ReactNode) => {
   if (!node || React.Children.count(node) !== 1) return false;
@@ -97,13 +99,10 @@ export async function generateMetadata({
 export const revalidate = 120; // 120초(2분)마다 ISR 리밸리데이션
 
 export async function generateStaticParams() {
-  // 프로덕션 빌드 시에는 draft 포스트 제외
-  const isDevelopment = process.env.NODE_ENV === "development";
   const posts = await fetchBlogPosts({
-    includeDrafts: isDevelopment,
+    includeDrafts: false, // 빌드 시에는 draft 제외
   });
 
-  // draft가 아닌 포스트만 빌드
   return posts.map((post) => ({
     slug: post.slug,
   }));
@@ -125,9 +124,13 @@ export default async function Post({
 
   const { content, frontmatter } = post;
 
-  // 개발 환경이 아닌 경우에만 draft 체크
-  const isDevelopment = process.env.NODE_ENV === "development";
-  if (!isDevelopment && !isPostPublished(post)) {
+  // 세션 정보 가져오기
+  const session = await getServerSession(authOptions);
+  const isAdmin = session?.user?.isAdmin || false;
+
+  const canViewDrafts = process.env.NODE_ENV === "development" || isAdmin;
+
+  if (!canViewDrafts && !isPostPublished(post)) {
     notFound();
   }
 
