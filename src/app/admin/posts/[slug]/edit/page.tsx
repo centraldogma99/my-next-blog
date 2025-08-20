@@ -5,6 +5,7 @@ import { useRouter, useParams } from "next/navigation";
 import dynamic from "next/dynamic";
 import { Loader2 } from "lucide-react";
 import { generateFrontmatter } from "@/utils/frontmatter";
+import { useTheme } from "@/contexts/ThemeContext";
 
 const MDEditor = dynamic(
   () => import("@uiw/react-md-editor").then((mod) => mod.default),
@@ -24,6 +25,7 @@ export default function EditPostPage() {
   const router = useRouter();
   const params = useParams();
   const slug = params.slug as string;
+  const { theme } = useTheme();
 
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -204,13 +206,15 @@ export default function EditPostPage() {
 
         <div>
           <label className="block text-sm font-medium mb-2">내용 *</label>
-          <div data-color-mode="light" className="min-h-[500px]">
-            <MDEditor
-              value={form.content}
-              onChange={(value) => setForm({ ...form, content: value || "" })}
-              preview="live"
-              height={500}
-            />
+          <div data-color-mode={theme} className="min-h-[500px]">
+            <div className="wmde-markdown-var">
+              <MDEditor
+                value={form.content}
+                onChange={(value) => setForm({ ...form, content: value || "" })}
+                preview="live"
+                height={500}
+              />
+            </div>
           </div>
         </div>
 
