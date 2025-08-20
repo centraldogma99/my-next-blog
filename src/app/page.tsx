@@ -17,8 +17,7 @@ export default async function Posts({
   const isAdmin = session?.user?.isAdmin || false;
 
   // 개발 환경이거나 운영 환경에서 관리자인 경우 draft 토글 가능
-  const isDevelopment = process.env.NODE_ENV === "development";
-  const canViewDrafts = isDevelopment || isAdmin;
+  const canViewDrafts = process.env.NODE_ENV === "development" || isAdmin;
   const includeDrafts = canViewDrafts && showDrafts === "true";
 
   // draft 포스트 포함 여부 결정
