@@ -3,7 +3,7 @@ import { fetchBlogPosts, getTagCounts } from "@/utils/api/github";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 
-export const revalidate = 120; // 120초(2분)마다 ISR 리밸리데이션
+export const revalidate = 20000;
 
 export default async function Posts({
   searchParams,

@@ -96,7 +96,7 @@ export async function generateMetadata({
   }
 }
 
-export const revalidate = 120; // 120초(2분)마다 ISR 리밸리데이션
+export const revalidate = 20000;
 
 export async function generateStaticParams() {
   const posts = await fetchBlogPosts({
