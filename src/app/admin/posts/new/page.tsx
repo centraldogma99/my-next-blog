@@ -4,7 +4,6 @@ import { useState, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import dynamic from "next/dynamic";
 import { Loader2 } from "lucide-react";
-import { generateFrontmatter } from "@/utils/frontmatter";
 
 const MDEditor = dynamic(
   () => import("@uiw/react-md-editor").then((mod) => mod.default),
@@ -36,24 +35,18 @@ export default function NewPostPage() {
       setLoading(true);
 
       try {
-        // FormData 생성
-        const formData = new FormData();
-        formData.append('title', form.title);
-        formData.append('tags', form.tags);
-        formData.append('description', form.subtitle || '');
-        formData.append('draft', String(form.draft));
-        
         // 파일명 생성 (제목을 slug로 변환)
         const slug = form.title
           .toLowerCase()
           .replace(/[^a-z0-9가-힣]/g, "-")
           .replace(/-+/g, "-")
           .replace(/^-|-$/g, "");
-        formData.append('slug', slug);
         
-        // frontmatter 생성
-        const frontmatter = generateFrontmatter(formData);
-        const fullContent = `${frontmatter}${form.content}`;
+        // 태그 배열로 변환
+        const tagsArray = form.tags
+          .split(",")
+          .map((tag) => tag.trim())
+          .filter((tag) => tag.length > 0);
 
         const response = await fetch("/api/posts", {
           method: "POST",
@@ -62,7 +55,14 @@ export default function NewPostPage() {
           },
           body: JSON.stringify({
             slug,
-            content: fullContent,
+            frontmatter: {
+              title: form.title,
+              subtitle: form.subtitle || undefined,
+              tag: tagsArray,
+              draft: form.draft,
+              date: new Date().toISOString().split('T')[0],
+            },
+            content: form.content,
           }),
         });
 
