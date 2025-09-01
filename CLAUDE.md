@@ -8,8 +8,10 @@ This file provides comprehensive guidance to Claude Code (claude.ai/code) when w
 
 ### 핵심 특징
 - GitHub API를 통한 외부 콘텐츠 관리
+- SHA 해시 기반 안전한 파일 업데이트
 - 다크/라이트 테마 지원
 - 태그 기반 포스트 필터링
+- Draft/공개 포스트 분리 관리
 - 서버 사이드 렌더링 (SSR) 최적화
 - 반응형 디자인
 - MDEditor를 활용한 관리자 포스트 편집 기능
@@ -58,9 +60,11 @@ my-next-blog/
 │   │   │   └── [slug]/
 │   │   │       └── page.tsx      # 개별 포스트 페이지
 │   │   ├── admin/                # 관리자 영역
-│   │   │   └── posts/
-│   │   │       ├── new/          # 새 포스트 작성
-│   │   │       └── [slug]/edit/  # 포스트 편집
+│   │   │   ├── posts/
+│   │   │   │   ├── new/          # 새 포스트 작성
+│   │   │   │   └── [slug]/edit/  # 포스트 편집
+│   │   │   └── drafts/
+│   │   │       └── [slug]/       # Draft 포스트 상세 페이지
 │   │   ├── auth/                 # 인증 관련 페이지
 │   │   ├── api/                  # API 라우트
 │   │   │   └── auth/             # NextAuth 핸들러
@@ -69,11 +73,13 @@ my-next-blog/
 │   │   ├── ThemeToggle.tsx       # 테마 전환 버튼
 │   │   ├── AuthButton.tsx        # 로그인/로그아웃 버튼
 │   │   ├── AuthProvider.tsx      # NextAuth 세션 프로바이더
-│   │   ├── AdminButtons.tsx      # 관리자 액션 버튼
+│   │   ├── AdminButtons.tsx      # 관리자 액션 버튼 (SHA 기반 업데이트)
 │   │   └── NewPostButton.tsx     # 새 포스트 작성 버튼
 │   ├── contexts/                 # React Context
 │   │   └── ThemeContext.tsx      # 테마 상태 관리
 │   ├── utils/                    # 유틸리티 함수
+│   │   ├── api/
+│   │   │   └── github.ts         # GitHub API 통합 함수 (SHA 포함)
 │   │   ├── fetchGithubAPI.ts     # GitHub API 통신
 │   │   ├── githubBlogPost.ts     # 블로그 포스트 fetching
 │   │   ├── parseFrontmatter.ts   # Frontmatter 파싱
@@ -97,14 +103,24 @@ my-next-blog/
 
 ## 높은 수준의 아키텍처
 
+### API 엔드포인트
+
+#### 포스트 관련 API
+- `GET /api/posts/[slug]`: 개별 포스트 정보 조회
+- `PUT /api/posts/[slug]`: 포스트 업데이트 (SHA 필수)
+- `DELETE /api/posts/[slug]`: 포스트 삭제 (SHA 필수)
+- `POST /api/posts/[slug]/toggle-draft`: Draft 상태 토글 (SHA 필수)
+- `POST /api/posts`: 새 포스트 생성
+
 ### 핵심 데이터 플로우
 
 1. **포스트 가져오기**: 
-   - `fetchBlogPostsGithubAPI` 함수가 GitHub API를 통해 마크다운 파일 목록 및 내용을 가져옴
+   - `fetchBlogPosts`, `fetchSingleBlogPost` 함수가 GitHub API를 통해 마크다운 파일 목록 및 내용을 가져옴
    - GitHub API 엔드포인트: `https://api.github.com/repos/centraldogma99/dogma-blog-posts/contents`
    - 인증: `GITHUB_API_KEY` 환경 변수 사용
    - 에러 처리: 404 시 `notFound()`, 기타 에러 시 예외 발생
    - 캐싱: Next.js의 `revalidate` 옵션으로 ISR(Incremental Static Regeneration) 구현
+   - **SHA 값 활용**: GitHub 파일의 SHA 해시값을 포함하여 업데이트 시 사용
 
 2. **콘텐츠 처리**: 
    - Base64로 인코딩된 GitHub 응답을 `decodeBase64Content`로 디코딩
@@ -123,6 +139,9 @@ my-next-blog/
      - Shiki를 사용한 코드 구문 강조
      - 목차(TOC) 자동 생성
      - 해시 기반 스크롤 내비게이션
+   - Draft 포스트 페이지(`admin/drafts/[slug]/page.tsx`):
+     - 인증된 사용자만 접근 가능
+     - Draft 상태 포스트 미리보기
 
 ### 컴포넌트 아키텍처
 
@@ -131,11 +150,12 @@ my-next-blog/
 **서버 컴포넌트** (기본값, 데이터 페칭 및 정적 렌더링):
 - `app/page.tsx`: 포스트 목록 데이터 페칭
 - `posts/[slug]/page.tsx`: 개별 포스트 데이터 페칭 및 메타데이터 생성
+- `admin/drafts/[slug]/page.tsx`: Draft 포스트 데이터 페칭
 - `CodeBlock`: Shiki 구문 강조 처리 (무거운 라이브러리)
 - SEO 관련 컴포넌트들 (sitemap, robots, opengraph)
 
 **클라이언트 컴포넌트** (`"use client"` 지시문 사용):
-- `PostsList`: 태그 필터링 상태 관리
+- `PostsList`: 태그 필터링 상태 관리, Draft 포스트는 `/admin/drafts/[slug]`로 라우팅
 - `TabFilter`: 태그 선택 인터랙션
 - `DraftToggle`: Draft 포스트 표시 토글
 - `ThemeContext/ThemeToggle`: 테마 전환 상태
@@ -143,6 +163,7 @@ my-next-blog/
 - `TableOfContents`: 목차 내비게이션
 - `MDEditor` 기반 컴포넌트들 (관리자 영역)
 - `AuthButton`, `AuthProvider`: 인증 관련 컴포넌트
+- `AdminButtons`: SHA 값을 활용한 Draft 토글 및 포스트 편집
 
 #### 상태 관리
 - **ThemeContext**: 전역 다크/라이트 테마 상태 (Context API + localStorage)
@@ -155,12 +176,13 @@ my-next-blog/
 
 #### GitHub API 타입 (`src/types/githubAPI/`)
 - `GetContentsResponse`: 파일 목록 응답
-- `GetContentsDetailData`: 개별 파일 내용 응답
+- `GetContentsDetailData`: 개별 파일 내용 응답 (SHA 필드 포함)
 
 #### 도메인 타입
-- `Post`: 파일명과 frontmatter 포함
+- `BlogPost`: 파일명, frontmatter, content, SHA 포함
 - `Frontmatter`: 포스트 메타데이터
 - `Theme`: "light" | "dark"
+- `FetchPostsOptions`: 포스트 fetching 옵션 (includeDrafts, includeContent, sortByDate)
 
 ## 주요 의존성
 
