@@ -7,7 +7,7 @@ import {
 } from "@/utils/api";
 import {
   generateFrontmatterString,
-  validateFrontmatter,
+  isValidFrontmatter,
   type Frontmatter,
 } from "@/utils/frontmatter";
 
@@ -53,7 +53,7 @@ export const PUT = createAuthenticatedHandler<RouteParams>(
       content: string;
     };
 
-    if (!content || !validateFrontmatter(frontmatter)) {
+    if (!content || !isValidFrontmatter(frontmatter)) {
       return NextResponse.json(
         { message: "잘못된 요청입니다." },
         { status: 400 },

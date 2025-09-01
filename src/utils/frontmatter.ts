@@ -4,7 +4,6 @@ function getCurrentDate(): string {
   return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}-${String(now.getDate()).padStart(2, "0")}`;
 }
 
-// 개선된 generateFrontmatterString - 객체를 받음
 export function generateFrontmatterString(
   frontmatter: Partial<Frontmatter> & { title: string; date: string },
 ): string {
@@ -139,16 +138,3 @@ export const isValidFrontmatter = (
     Array.isArray(frontmatter.tag)
   );
 };
-
-export function validateFrontmatter(
-  frontmatter: Frontmatter | undefined,
-): frontmatter is Frontmatter {
-  if (!frontmatter) return false;
-
-  return (
-    !!frontmatter.title &&
-    !!frontmatter.date &&
-    !!frontmatter.tag &&
-    frontmatter.draft !== undefined
-  );
-}
