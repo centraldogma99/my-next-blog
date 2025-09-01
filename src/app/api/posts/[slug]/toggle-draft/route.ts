@@ -49,7 +49,10 @@ export const POST = createAuthenticatedHandler<RouteParams>(
     // 현재 파일의 SHA 가져오기
     const sha = await getFileSHA(octokit, githubConfig, path);
     if (!sha) {
-      throw new Error("파일 정보를 가져올 수 없습니다.");
+      return NextResponse.json(
+        { message: "잘못된 요청입니다." },
+        { status: 400 },
+      );
     }
 
     // Base64 인코딩
