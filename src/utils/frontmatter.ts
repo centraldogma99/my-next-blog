@@ -4,9 +4,7 @@ function getCurrentDate(): string {
   return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}-${String(now.getDate()).padStart(2, "0")}`;
 }
 
-export function generateFrontmatterString(
-  frontmatter: Partial<Frontmatter> & { title: string; date: string },
-): string {
+export function generateFrontmatterString(frontmatter: Frontmatter): string {
   // 날짜가 제공되지 않으면 현재 날짜 사용
   const formattedDate = frontmatter.date || getCurrentDate();
 
@@ -26,7 +24,6 @@ export function generateFrontmatterString(
     frontmatterStr += `description: "${frontmatter.description}"\n`;
   }
 
-  // draft 필드는 항상 포함
   frontmatterStr += `draft: ${frontmatter.draft === true ? "true" : "false"}\n`;
 
   frontmatterStr += "---\n\n";
