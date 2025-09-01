@@ -139,3 +139,16 @@ export const isValidFrontmatter = (
     Array.isArray(frontmatter.tag)
   );
 };
+
+export function validateFrontmatter(
+  frontmatter: Frontmatter | undefined,
+): frontmatter is Frontmatter {
+  if (!frontmatter) return false;
+
+  return (
+    !!frontmatter.title &&
+    !!frontmatter.date &&
+    !!frontmatter.tag &&
+    frontmatter.draft !== undefined
+  );
+}

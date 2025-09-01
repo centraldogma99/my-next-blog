@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { createAuthenticatedHandler, getCommitterInfo } from "@/utils/api";
 import {
   generateFrontmatterString,
+  validateFrontmatter,
   type Frontmatter,
 } from "@/utils/frontmatter";
 
@@ -14,14 +15,7 @@ export const POST = createAuthenticatedHandler(async (context) => {
     content: string;
   };
 
-  if (
-    !slug ||
-    !frontmatter?.title ||
-    !content ||
-    !frontmatter?.date ||
-    !frontmatter?.tag ||
-    frontmatter?.draft === undefined
-  ) {
+  if (!slug || !content || !validateFrontmatter(frontmatter)) {
     return NextResponse.json(
       { message: "잘못된 요청입니다." },
       { status: 400 },
