@@ -39,7 +39,10 @@ export default function PostsList({ posts, tags, initialTag }: TabViewProps) {
               key={post.slug}
               className="p-4 border border-[var(--color-border)] rounded-lg hover:border-[var(--color-primary)] transition-colors bg-[var(--color-bg)]"
             >
-              <Link href={`/posts/${post.slug}`} className="block">
+              <Link 
+                href={post.frontmatter.draft ? `/admin/drafts/${post.slug}` : `/posts/${post.slug}`} 
+                className="block"
+              >
                 <h3 className="text-lg font-semibold mb-2 text-[var(--color-text)] hover:text-[var(--color-primary)]">
                   {post.frontmatter.title}
                   {post.frontmatter.draft && (

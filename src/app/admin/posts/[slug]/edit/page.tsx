@@ -18,6 +18,7 @@ interface PostForm {
   content: string;
   draft: boolean;
   date: string;
+  sha: string;
 }
 
 export default function EditPostPage() {
@@ -35,6 +36,7 @@ export default function EditPostPage() {
     content: "",
     draft: false,
     date: "",
+    sha: "",
   });
 
   // 기존 포스트 로드
@@ -47,7 +49,7 @@ export default function EditPostPage() {
         }
 
         const data = await response.json();
-        const { frontmatter, content } = data;
+        const { frontmatter, content, sha } = data;
 
         setForm({
           title: frontmatter.title || "",
@@ -56,6 +58,7 @@ export default function EditPostPage() {
           content: content || "",
           draft: frontmatter.draft || false,
           date: frontmatter.date || "",
+          sha: sha,
         });
       } catch (error) {
         console.error("Error loading post:", error);
@@ -73,6 +76,14 @@ export default function EditPostPage() {
     async (e: React.FormEvent) => {
       e.preventDefault();
       setSaving(true);
+
+      if (!form.sha) {
+        alert(
+          "파일 정보를 가져올 수 없습니다. 페이지를 새로고침 후 다시 시도해주세요.",
+        );
+        setSaving(false);
+        return;
+      }
 
       try {
         // 태그 배열로 변환
@@ -95,6 +106,7 @@ export default function EditPostPage() {
               date: form.date || new Date().toISOString().split("T")[0],
             },
             content: form.content,
+            sha: form.sha,
           }),
         });
 

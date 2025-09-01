@@ -9,6 +9,7 @@ export type GetContentsDetailData = {
   name: string;
   path: string;
   content: string;
+  sha: string;
 };
 
 export type GetContentsDetailError = {

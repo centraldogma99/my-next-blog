@@ -1,6 +1,6 @@
 import { HashScrollHandler } from "@/app/posts/[slug]/(components)/HashScrollHandler";
 import { extractHeadingsFromContents } from "@/utils/contentProcessing";
-import { fetchBlogPosts, fetchSingleBlogPost } from "@/utils/api/github";
+import { fetchSingleBlogPost } from "@/utils/api/github";
 import { AUTHOR_NAME } from "@/constants/site";
 import MarkdownContent from "@/components/MarkdownContent";
 import type { Metadata } from "next";
@@ -8,6 +8,8 @@ import { TableOfContents } from "@/app/posts/[slug]/(components)/TableOfContents
 import { notFound } from "next/navigation";
 import AdminButtons from "@/components/AdminButtons";
 import Script from "next/script";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/lib/auth";
 
 export async function generateMetadata({
   params,
@@ -21,35 +23,10 @@ export async function generateMetadata({
     const { frontmatter } = post;
 
     return {
-      title: frontmatter.title,
+      title: `[DRAFT] ${frontmatter.title}`,
       description:
         frontmatter.description || `${frontmatter.title}에 대한 글입니다.`,
-      keywords: frontmatter.tag,
-      authors: [{ name: AUTHOR_NAME }],
-      openGraph: {
-        title: frontmatter.title,
-        description:
-          frontmatter.description || `${frontmatter.title}에 대한 글입니다.`,
-        type: "article",
-        publishedTime: frontmatter.date,
-        authors: [AUTHOR_NAME],
-        tags: frontmatter.tag,
-        images: [
-          {
-            url: `/posts/${slug}/opengraph-image`,
-            width: 1200,
-            height: 630,
-            alt: frontmatter.title,
-          },
-        ],
-      },
-      twitter: {
-        card: "summary_large_image",
-        title: frontmatter.title,
-        description:
-          frontmatter.description || `${frontmatter.title}에 대한 글입니다.`,
-        images: [`/posts/${slug}/opengraph-image`],
-      },
+      robots: "noindex, nofollow", // Draft 포스트는 검색 엔진에서 제외
     };
   } catch {
     return {
@@ -59,23 +36,23 @@ export async function generateMetadata({
   }
 }
 
-export const revalidate = 20000;
+// Draft 페이지는 항상 동적으로 렌더링
+export const dynamic = "force-dynamic";
 
-export async function generateStaticParams() {
-  const posts = await fetchBlogPosts({
-    includeDrafts: false, // 빌드 시에는 draft 제외
-  });
-
-  return posts.map((post) => ({
-    slug: post.slug,
-  }));
-}
-
-export default async function Post({
+export default async function DraftPost({
   params,
 }: {
   params: Promise<{ slug: string }>;
 }) {
+  // 세션 체크 - 관리자만 접근 가능
+  const session = await getServerSession(authOptions);
+  const isAdmin = session?.user?.isAdmin || false;
+  const canViewDrafts = process.env.NODE_ENV === "development" || isAdmin;
+
+  if (!canViewDrafts) {
+    notFound();
+  }
+
   const { slug } = await params;
 
   let post;
@@ -87,8 +64,13 @@ export default async function Post({
 
   const { content, frontmatter } = post;
 
-  if (frontmatter.draft) {
-    notFound();
+  // Draft가 아닌 포스트는 일반 포스트 페이지로 리다이렉트
+  if (!frontmatter.draft) {
+    return (
+      <Script id="redirect-to-post">
+        {`window.location.href = '/posts/${slug}';`}
+      </Script>
+    );
   }
 
   if (!content) {
@@ -137,17 +119,11 @@ export default async function Post({
               <div className="flex items-start justify-between gap-4 mb-6">
                 <h1 className="break-keep flex-1">
                   {frontmatter.title}
-                  {frontmatter.draft && (
-                    <span className="ml-3 px-3 py-1 text-base bg-yellow-500 text-white rounded">
-                      DRAFT
-                    </span>
-                  )}
+                  <span className="ml-3 px-3 py-1 text-base bg-yellow-500 text-white rounded">
+                    DRAFT
+                  </span>
                 </h1>
-                <AdminButtons
-                  slug={slug}
-                  isDraft={frontmatter.draft}
-                  sha={post.sha}
-                />
+                <AdminButtons slug={slug} isDraft={frontmatter.draft} sha={post.sha} />
               </div>
               <MarkdownContent 
                 content={content} 

@@ -1,10 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { fetchSingleBlogPost } from "@/utils/api/github";
-import {
-  createAuthenticatedHandler,
-  getCommitterInfo,
-  getFileSHA,
-} from "@/utils/api";
+import { createAuthenticatedHandler, getCommitterInfo } from "@/utils/api";
 import {
   generateFrontmatterString,
   isValidFrontmatter,
@@ -48,12 +44,13 @@ export const PUT = createAuthenticatedHandler<RouteParams>(
 
     const { slug } = params;
 
-    const { frontmatter, content } = (await request.json()) as {
+    const { frontmatter, content, sha } = (await request.json()) as {
       frontmatter: Frontmatter;
       content: string;
+      sha: string;
     };
 
-    if (!content || !isValidFrontmatter(frontmatter)) {
+    if (!content || !isValidFrontmatter(frontmatter) || !sha) {
       return NextResponse.json(
         { message: "잘못된 요청입니다." },
         { status: 400 },
@@ -65,15 +62,6 @@ export const PUT = createAuthenticatedHandler<RouteParams>(
 
     // 파일 경로
     const path = `posts/${slug}.md`;
-
-    // 현재 파일의 SHA 가져오기
-    const sha = await getFileSHA(octokit, githubConfig, path);
-    if (!sha) {
-      return NextResponse.json(
-        { message: "파일 정보를 가져올 수 없습니다." },
-        { status: 500 },
-      );
-    }
 
     // 전체 콘텐츠 생성 및 Base64 인코딩
     const fullContent = frontmatterString + content;
@@ -100,7 +88,7 @@ export const PUT = createAuthenticatedHandler<RouteParams>(
 // DELETE: 포스트 삭제 - 인증 필요
 export const DELETE = createAuthenticatedHandler<RouteParams>(
   async (context, params) => {
-    const { octokit, githubConfig, user } = context;
+    const { request, octokit, githubConfig, user } = context;
 
     if (!params) {
       return NextResponse.json(
@@ -111,17 +99,19 @@ export const DELETE = createAuthenticatedHandler<RouteParams>(
 
     const { slug } = params;
 
-    // 파일 경로
-    const path = `posts/${slug}.md`;
+    const { sha } = (await request.json()) as {
+      sha: string;
+    };
 
-    // 현재 파일의 SHA 가져오기
-    const sha = await getFileSHA(octokit, githubConfig, path);
     if (!sha) {
       return NextResponse.json(
-        { message: "파일 정보를 가져올 수 없습니다." },
-        { status: 500 },
+        { message: "잘못된 요청입니다." },
+        { status: 400 },
       );
     }
+
+    // 파일 경로
+    const path = `posts/${slug}.md`;
 
     // 파일 삭제
     const response = await octokit.rest.repos.deleteFile({
