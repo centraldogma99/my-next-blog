@@ -1,10 +1,6 @@
 import { NextResponse } from "next/server";
 import { fetchSingleBlogPost } from "@/utils/api/github";
-import {
-  createAuthenticatedHandler,
-  getCommitterInfo,
-  getFileSHA,
-} from "@/utils/api";
+import { createAuthenticatedHandler, getCommitterInfo } from "@/utils/api";
 import { generateFrontmatterString } from "@/utils/frontmatter";
 
 interface RouteParams {
@@ -13,7 +9,7 @@ interface RouteParams {
 
 export const POST = createAuthenticatedHandler<RouteParams>(
   async (context, params) => {
-    const { octokit, githubConfig, user } = context;
+    const { request, octokit, githubConfig, user } = context;
 
     if (!params || !params.slug) {
       return NextResponse.json(
@@ -24,6 +20,17 @@ export const POST = createAuthenticatedHandler<RouteParams>(
 
     const { slug } = params;
     const fileName = `${slug}.md`;
+
+    const { sha } = (await request.json()) as {
+      sha: string;
+    };
+
+    if (!sha) {
+      return NextResponse.json(
+        { message: "잘못된 요청입니다." },
+        { status: 400 },
+      );
+    }
 
     // 현재 포스트 내용 가져오기
     const post = await fetchSingleBlogPost(fileName, true);
@@ -45,15 +52,6 @@ export const POST = createAuthenticatedHandler<RouteParams>(
 
     // 파일 경로
     const path = `posts/${fileName}`;
-
-    // 현재 파일의 SHA 가져오기
-    const sha = await getFileSHA(octokit, githubConfig, path);
-    if (!sha) {
-      return NextResponse.json(
-        { message: "잘못된 요청입니다." },
-        { status: 400 },
-      );
-    }
 
     // Base64 인코딩
     const contentBase64 = Buffer.from(updatedContent).toString("base64");

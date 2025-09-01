@@ -87,6 +87,7 @@ export interface BlogPost {
   slug: string;
   frontmatter: Frontmatter;
   content?: string;
+  sha: string;
 }
 
 export interface FetchPostsOptions {
@@ -168,6 +169,7 @@ export async function fetchSingleBlogPost(
   return {
     slug: fileNameWithoutExtension,
     frontmatter,
+    sha: data.sha,
     ...(includeContent && { content }),
   };
 }
