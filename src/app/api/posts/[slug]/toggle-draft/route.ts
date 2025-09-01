@@ -37,7 +37,7 @@ export const POST = createAuthenticatedHandler<RouteParams>(
     formData.append("title", frontmatter.title);
     formData.append("date", frontmatter.date);
     formData.append("tags", frontmatter.tag?.join(", ") || "");
-    formData.append("subtitle", frontmatter.subtitle || "");
+    formData.append("description", frontmatter.description || "");
     formData.append("draft", newDraftState.toString());
 
     // generateFrontmatter 함수로 frontmatter 생성

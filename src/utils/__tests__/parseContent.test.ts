@@ -27,10 +27,10 @@ tag:
     expect(result.content).toBe("# 테스트 내용\n\n이것은 테스트 내용입니다.");
   });
 
-  it("subtitle이 있는 frontmatter를 파싱한다", () => {
+  it("description이 있는 frontmatter를 파싱한다", () => {
     const markdown = `---
 title: "메인 제목"
-subtitle: "부제목"
+description: "설명"
 date: "2023-01-01"
 draft: false
 tag:
@@ -41,7 +41,7 @@ tag:
 
     const result = parseContent(markdown);
 
-    expect(result.frontmatter.subtitle).toBe("부제목");
+    expect(result.frontmatter.description).toBe("설명");
   });
 
   it("boolean 값을 올바르게 파싱한다", () => {
@@ -96,10 +96,10 @@ tag:
     expect(result.frontmatter.date).toBe("2025-08-01");
   });
 
-  it("빈 subtitle 값을 올바르게 파싱한다", () => {
+  it("빈 description 값을 올바르게 파싱한다", () => {
     const markdown = `---
 title: 테스트 제목
-subtitle: 
+description: 
 date: 2025-08-01
 draft: false
 tag:
@@ -110,14 +110,14 @@ tag:
 
     const result = parseContent(markdown);
 
-    expect(result.frontmatter.subtitle).toBe("");
+    expect(result.frontmatter.description).toBe("");
     expect(result.frontmatter.title).toBe("테스트 제목");
   });
 
   it("작은 따옴표와 큰 따옴표가 섞여있어도 올바르게 파싱한다", () => {
     const markdown = `---
 title: '작은 따옴표 제목'
-subtitle: "큰 따옴표 부제목"
+description: "큰 따옴표 설명"
 date: 2025-08-01
 draft: false
 tag:
@@ -129,13 +129,13 @@ tag:
     const result = parseContent(markdown);
 
     expect(result.frontmatter.title).toBe("작은 따옴표 제목");
-    expect(result.frontmatter.subtitle).toBe("큰 따옴표 부제목");
+    expect(result.frontmatter.description).toBe("큰 따옴표 설명");
   });
 
   it("중간에 따옴표가 포함된 텍스트를 올바르게 파싱한다", () => {
     const markdown = `---
 title: JavaScript의 "this" 키워드와 '화살표 함수' 이해하기
-subtitle: "Hello World"를 넘어선 'Real' 프로그래밍
+description: "Hello World"를 넘어선 'Real' 프로그래밍
 date: 2025-08-01
 draft: false
 tag:
@@ -149,7 +149,7 @@ tag:
     expect(result.frontmatter.title).toBe(
       "JavaScript의 \"this\" 키워드와 '화살표 함수' 이해하기",
     );
-    expect(result.frontmatter.subtitle).toBe(
+    expect(result.frontmatter.description).toBe(
       "\"Hello World\"를 넘어선 'Real' 프로그래밍",
     );
   });
@@ -157,7 +157,7 @@ tag:
   it("양쪽 끝에 따옴표가 있고 중간에도 따옴표가 있는 경우", () => {
     const markdown = `---
 title: "JavaScript의 'this' 키워드와 \"화살표 함수\" 이해하기"
-subtitle: '프로그래밍에서 "따옴표"의 의미'
+description: '프로그래밍에서 "따옴표"의 의미'
 date: 2025-08-01
 draft: false
 tag:
@@ -171,7 +171,7 @@ tag:
     expect(result.frontmatter.title).toBe(
       "JavaScript의 'this' 키워드와 \"화살표 함수\" 이해하기",
     );
-    expect(result.frontmatter.subtitle).toBe('프로그래밍에서 "따옴표"의 의미');
+    expect(result.frontmatter.description).toBe('프로그래밍에서 "따옴표"의 의미');
   });
 });
 

@@ -14,7 +14,7 @@ const MDEditor = dynamic(
 
 interface PostForm {
   title: string;
-  subtitle: string;
+  description: string;
   tags: string;
   content: string;
   draft: boolean;
@@ -31,7 +31,7 @@ export default function EditPostPage() {
   const [saving, setSaving] = useState(false);
   const [form, setForm] = useState<PostForm>({
     title: "",
-    subtitle: "",
+    description: "",
     tags: "",
     content: "",
     draft: false,
@@ -52,7 +52,7 @@ export default function EditPostPage() {
 
         setForm({
           title: frontmatter.title || "",
-          subtitle: frontmatter.subtitle || "",
+          description: frontmatter.description || "",
           tags: frontmatter.tag?.join(", ") || "",
           content: content || "",
           draft: frontmatter.draft || false,
@@ -80,7 +80,7 @@ export default function EditPostPage() {
         const formData = new FormData();
         formData.append('title', form.title);
         formData.append('tags', form.tags);
-        formData.append('description', form.subtitle || '');
+        formData.append('description', form.description || '');
         formData.append('date', form.date);
         formData.append('slug', slug);
         formData.append('draft', String(form.draft));
@@ -162,18 +162,18 @@ export default function EditPostPage() {
 
         <div>
           <label
-            htmlFor="subtitle"
+            htmlFor="description"
             className="block text-sm font-medium mb-2"
           >
-            부제목
+            설명
           </label>
           <input
-            id="subtitle"
+            id="description"
             type="text"
-            value={form.subtitle}
-            onChange={(e) => setForm({ ...form, subtitle: e.target.value })}
+            value={form.description}
+            onChange={(e) => setForm({ ...form, description: e.target.value })}
             className="w-full px-4 py-2 rounded-lg border border-[var(--color-border)] bg-[var(--color-bg-secondary)] focus:outline-none focus:ring-2 focus:ring-blue-500"
-            placeholder="포스트 부제목"
+            placeholder="포스트 설명"
           />
         </div>
 

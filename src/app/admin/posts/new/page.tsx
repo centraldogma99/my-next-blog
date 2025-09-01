@@ -14,7 +14,7 @@ const MDEditor = dynamic(
 
 interface PostForm {
   title: string;
-  subtitle: string;
+  description: string;
   tags: string;
   content: string;
   draft: boolean;
@@ -26,7 +26,7 @@ export default function NewPostPage() {
   const [loading, setLoading] = useState(false);
   const [form, setForm] = useState<PostForm>({
     title: "",
-    subtitle: "",
+    description: "",
     tags: "",
     content: "",
     draft: true,
@@ -42,7 +42,7 @@ export default function NewPostPage() {
         const formData = new FormData();
         formData.append('title', form.title);
         formData.append('tags', form.tags);
-        formData.append('description', form.subtitle || '');
+        formData.append('description', form.description || '');
         formData.append('draft', String(form.draft));
         
         // 파일명 생성 (제목을 slug로 변환)
@@ -110,18 +110,18 @@ export default function NewPostPage() {
 
         <div>
           <label
-            htmlFor="subtitle"
+            htmlFor="description"
             className="block text-sm font-medium mb-2"
           >
-            부제목
+            설명
           </label>
           <input
-            id="subtitle"
+            id="description"
             type="text"
-            value={form.subtitle}
-            onChange={(e) => setForm({ ...form, subtitle: e.target.value })}
+            value={form.description}
+            onChange={(e) => setForm({ ...form, description: e.target.value })}
             className="w-full px-4 py-2 rounded-lg border border-[var(--color-border)] bg-[var(--color-bg-secondary)] focus:outline-none focus:ring-2 focus:ring-blue-500"
-            placeholder="포스트 부제목"
+            placeholder="포스트 설명"
           />
         </div>
 
