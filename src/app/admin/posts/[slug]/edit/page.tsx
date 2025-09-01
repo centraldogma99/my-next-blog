@@ -4,7 +4,6 @@ import { useState, useCallback, useEffect } from "react";
 import { useRouter, useParams } from "next/navigation";
 import dynamic from "next/dynamic";
 import { Loader2 } from "lucide-react";
-import { generateFrontmatter } from "@/utils/frontmatter";
 import { useTheme } from "@/contexts/ThemeContext";
 
 const MDEditor = dynamic(
@@ -76,18 +75,11 @@ export default function EditPostPage() {
       setSaving(true);
 
       try {
-        // FormData 생성
-        const formData = new FormData();
-        formData.append('title', form.title);
-        formData.append('tags', form.tags);
-        formData.append('description', form.description || '');
-        formData.append('date', form.date);
-        formData.append('slug', slug);
-        formData.append('draft', String(form.draft));
-        
-        // frontmatter 생성
-        const frontmatter = generateFrontmatter(formData);
-        const fullContent = `${frontmatter}${form.content}`;
+        // 태그 배열로 변환
+        const tagsArray = form.tags
+          .split(",")
+          .map((tag) => tag.trim())
+          .filter((tag) => tag.length > 0);
 
         const response = await fetch(`/api/posts/${slug}`, {
           method: "PUT",
@@ -95,7 +87,14 @@ export default function EditPostPage() {
             "Content-Type": "application/json",
           },
           body: JSON.stringify({
-            content: fullContent,
+            frontmatter: {
+              title: form.title,
+              description: form.description || undefined,
+              tag: tagsArray,
+              draft: form.draft,
+              date: form.date || new Date().toISOString().split("T")[0],
+            },
+            content: form.content,
           }),
         });
 
