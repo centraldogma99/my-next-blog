@@ -6,6 +6,7 @@ import dynamic from "next/dynamic";
 import { Loader2 } from "lucide-react";
 
 import { useTheme } from "@/contexts/ThemeContext";
+import { generateSlug } from "@/utils/contentProcessing";
 
 const MDEditor = dynamic(
   () => import("@uiw/react-md-editor").then((mod) => mod.default),
@@ -39,11 +40,7 @@ export default function NewPostPage() {
 
       try {
         // 파일명 생성 (제목을 slug로 변환)
-        const slug = form.title
-          .toLowerCase()
-          .replace(/[^a-z0-9가-힣]/g, "-")
-          .replace(/-+/g, "-")
-          .replace(/^-|-$/g, "");
+        const slug = generateSlug(form.title);
 
         // 태그 배열로 변환
         const tagsArray = form.tags
