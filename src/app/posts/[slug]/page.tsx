@@ -60,13 +60,13 @@ export async function generateMetadata({
     return {
       title: frontmatter.title,
       description:
-        frontmatter.subtitle || `${frontmatter.title}에 대한 글입니다.`,
+        frontmatter.description || `${frontmatter.title}에 대한 글입니다.`,
       keywords: frontmatter.tag,
       authors: [{ name: AUTHOR_NAME }],
       openGraph: {
         title: frontmatter.title,
         description:
-          frontmatter.subtitle || `${frontmatter.title}에 대한 글입니다.`,
+          frontmatter.description || `${frontmatter.title}에 대한 글입니다.`,
         type: "article",
         publishedTime: frontmatter.date,
         authors: [AUTHOR_NAME],
@@ -84,7 +84,7 @@ export async function generateMetadata({
         card: "summary_large_image",
         title: frontmatter.title,
         description:
-          frontmatter.subtitle || `${frontmatter.title}에 대한 글입니다.`,
+          frontmatter.description || `${frontmatter.title}에 대한 글입니다.`,
         images: [`/posts/${slug}/opengraph-image`],
       },
     };
@@ -143,7 +143,7 @@ export default async function Post({
     "@type": "BlogPosting",
     headline: frontmatter.title,
     description:
-      frontmatter.subtitle || `${frontmatter.title}에 대한 글입니다.`,
+      frontmatter.description || `${frontmatter.title}에 대한 글입니다.`,
     datePublished: frontmatter.date,
     dateModified: frontmatter.date,
     author: {
