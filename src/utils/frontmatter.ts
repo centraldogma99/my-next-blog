@@ -18,6 +18,9 @@ export function generateFrontmatterString(frontmatter: Frontmatter): string {
     frontmatter.tag.forEach((tag) => {
       frontmatterStr += `  - ${tag}\n`;
     });
+  } else {
+    // 빈 태그 배열도 필드는 반드시 출력 (parseContent에서 tag 필드 필수)
+    frontmatterStr += "tag: []\n";
   }
 
   if (frontmatter.description) {
@@ -75,8 +78,11 @@ export function parseContent(markdownContent: string): ParseResult {
     const key = trimmedLine.slice(0, colonIndex).trim();
     let value: string | boolean = trimmedLine.slice(colonIndex + 1).trim();
 
-    // 다음 줄이 배열인지 확인
-    if (i + 1 < lines.length && lines[i + 1].trim().startsWith("-")) {
+    // 인라인 빈 배열 처리 (tag: [])
+    if (value === "[]") {
+      frontmatter[key] = [];
+    } else if (i + 1 < lines.length && lines[i + 1].trim().startsWith("-")) {
+      // 다음 줄이 배열인지 확인
       frontmatter[key] = [];
     } else {
       // 빈 값 처리

@@ -1,4 +1,8 @@
-import { isValidFrontmatter, parseContent } from "@/utils/frontmatter";
+import {
+  isValidFrontmatter,
+  parseContent,
+  generateFrontmatterString,
+} from "@/utils/frontmatter";
 import { describe, it, expect } from "vitest";
 
 describe("parseFrontmatter", () => {
@@ -154,6 +158,38 @@ tag:
     );
   });
 
+  it("빈 태그 배열(tag: [])을 올바르게 파싱한다", () => {
+    const markdown = `---
+title: "빈 태그 포스트"
+date: "2025-02-06"
+tag: []
+draft: false
+---
+
+내용`;
+
+    const result = parseContent(markdown);
+
+    expect(result.frontmatter.tag).toEqual([]);
+    expect(result.frontmatter.title).toBe("빈 태그 포스트");
+  });
+
+  it("generateFrontmatterString으로 생성한 빈 태그 frontmatter를 parseContent로 파싱한다", () => {
+    const frontmatter = {
+      title: "테스트",
+      date: "2025-02-06",
+      tag: [],
+      draft: true,
+    };
+    const generated = generateFrontmatterString(frontmatter);
+    const fullContent = generated + "# 내용";
+    const result = parseContent(fullContent);
+
+    expect(result.frontmatter.title).toBe("테스트");
+    expect(result.frontmatter.tag).toEqual([]);
+    expect(result.frontmatter.draft).toBe(true);
+  });
+
   it("양쪽 끝에 따옴표가 있고 중간에도 따옴표가 있는 경우", () => {
     const markdown = `---
 title: "JavaScript의 'this' 키워드와 \"화살표 함수\" 이해하기"
@@ -171,7 +207,9 @@ tag:
     expect(result.frontmatter.title).toBe(
       "JavaScript의 'this' 키워드와 \"화살표 함수\" 이해하기",
     );
-    expect(result.frontmatter.description).toBe('프로그래밍에서 "따옴표"의 의미');
+    expect(result.frontmatter.description).toBe(
+      '프로그래밍에서 "따옴표"의 의미',
+    );
   });
 });
 
