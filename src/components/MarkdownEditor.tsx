@@ -35,7 +35,7 @@ function isAcceptedFile(file: File): boolean {
 }
 
 function createPlaceholder(fileName: string): string {
-  return `![Uploading ${fileName}...]()`;
+  return `Uploading ${fileName}...`;
 }
 
 function createMarkdown(
@@ -85,6 +85,7 @@ export default function MarkdownEditor({
   height = 500,
 }: MarkdownEditorProps) {
   const fileInputRef = useRef<HTMLInputElement>(null);
+  // handleUpload가 실행되는 동안 value가 변경된 경우에 대응하기 위해 ref 사용
   const valueRef = useRef(value);
   valueRef.current = value;
 
