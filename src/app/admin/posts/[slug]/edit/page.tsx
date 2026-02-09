@@ -2,14 +2,9 @@
 
 import { useState, useCallback, useEffect } from "react";
 import { useRouter, useParams } from "next/navigation";
-import dynamic from "next/dynamic";
 import { Loader2 } from "lucide-react";
 import { useTheme } from "@/contexts/ThemeContext";
-
-const MDEditor = dynamic(
-  () => import("@uiw/react-md-editor").then((mod) => mod.default),
-  { ssr: false },
-);
+import MarkdownEditor from "@/components/MarkdownEditor";
 
 interface PostForm {
   title: string;
@@ -217,16 +212,12 @@ export default function EditPostPage() {
 
         <div>
           <label className="block text-sm font-medium mb-2">내용 *</label>
-          <div data-color-mode={theme} className="min-h-[500px]">
-            <div className="wmde-markdown-var">
-              <MDEditor
-                value={form.content}
-                onChange={(value) => setForm({ ...form, content: value || "" })}
-                preview="live"
-                height={500}
-              />
-            </div>
-          </div>
+          <MarkdownEditor
+            value={form.content}
+            onChange={(content) => setForm({ ...form, content })}
+            theme={theme}
+            height={500}
+          />
         </div>
 
         <div className="flex gap-4">
